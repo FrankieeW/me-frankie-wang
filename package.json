@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "test": "node --experimental-strip-types --test src/lib/content.test.ts",
     "check": "astro check",
     "build": "astro build",
     "preview": "astro preview"
@@ -14,6 +15,7 @@
     "npm": ">=9.6.5"
   },
   "dependencies": {
+    "@astrojs/mdx": "7.0.3",
     "@astrojs/sitemap": "3.7.3",
     "astro": "7.1.1"
   },

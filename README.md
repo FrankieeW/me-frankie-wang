@@ -26,6 +26,7 @@ The development server prints its local URL when it starts.
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Start Astro's local development server. |
+| `npm test` | Run the localization and content-helper regression tests. |
 | `npm run check` | Run Astro and TypeScript diagnostics. |
 | `npm run build` | Create the static production build in `dist/`. |
 | `npm run preview` | Serve the production build locally. |
