@@ -51,6 +51,7 @@ type UiTranslations = {
     readonly friends: string;
     readonly history: string;
     readonly transcript: string;
+    readonly captions: string;
     readonly since: string;
   };
 };
@@ -111,6 +112,7 @@ export const UI_TRANSLATIONS = {
       friends: "Friends",
       history: "Site history",
       transcript: "Read transcript",
+      captions: "Captions",
       since: "Since {year}",
     },
   },
@@ -168,6 +170,7 @@ export const UI_TRANSLATIONS = {
       friends: "朋友们",
       history: "网站沿革",
       transcript: "阅读文字稿",
+      captions: "字幕",
       since: "始于 {year}",
     },
   },
@@ -226,6 +229,7 @@ export const UI_TRANSLATIONS = {
       friends: "Amis",
       history: "Histoire du site",
       transcript: "Lire la transcription",
+      captions: "Sous-titres",
       since: "Depuis {year}",
     },
   },

@@ -1,0 +1,122 @@
+---
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+import type { Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+type VideoMedia = {
+  readonly type: "video";
+  readonly src: string;
+  readonly poster: ImageMetadata;
+  readonly posterAlt: string;
+  readonly title: string;
+  readonly captions: string;
+};
+
+type AudioMedia = {
+  readonly type: "audio";
+  readonly src: string;
+  readonly title: string;
+  readonly transcript: string;
+};
+
+interface Props {
+  readonly locale: Locale;
+  readonly media: VideoMedia | AudioMedia;
+}
+
+const { locale, media } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const captionsLabel = `${copy.discovery.captions}: ${media.title}`;
+const transcriptLabel = `${copy.discovery.transcript}: ${media.title}`;
+const poster =
+  media.type === "video"
+    ? (
+        await getImage({
+          src: media.poster,
+          format: media.poster.format === "svg" ? "svg" : undefined,
+        })
+      ).src
+    : undefined;
+---
+
+<figure class:list={["entry-media", `entry-media--${media.type}`]}>
+  {
+    media.type === "video" ? (
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        poster={poster}
+        aria-label={`${media.title}: ${media.posterAlt}`}
+      >
+        <source src={media.src} />
+        <track
+          kind="captions"
+          src={media.captions}
+          srclang={locale}
+          label={captionsLabel}
+          default
+        />
+      </video>
+    ) : (
+      <audio controls preload="metadata" aria-label={media.title} src={media.src}>
+      </audio>
+    )
+  }
+  <figcaption>
+    <span>{media.title}</span>
+    {
+      media.type === "audio" && (
+        <a
+          class="entry-media__transcript"
+          href={media.transcript}
+          aria-label={transcriptLabel}
+        >
+          {copy.discovery.transcript}
+        </a>
+      )
+    }
+  </figcaption>
+</figure>
+
+<style>
+  video,
+  audio {
+    display: block;
+    width: 100%;
+  }
+
+  video {
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 12px;
+    background: var(--color-ink-panel);
+  }
+
+  audio {
+    min-height: var(--control-min-size);
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+    color: var(--color-ink);
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  figcaption > span {
+    display: block;
+  }
+
+  .entry-media__transcript {
+    display: block;
+    width: fit-content;
+    margin-top: var(--space-1);
+    color: var(--color-muted);
+    font-size: 13px;
+    text-underline-offset: 0.2em;
+  }
+</style>

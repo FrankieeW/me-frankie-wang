@@ -102,22 +102,44 @@ locale: <en | zh | fr>
 translationKey: <lowercase-kebab-case-key>
 publishedAt: <ISO-8601 date or timestamp>
 draft: true
+topics: [<daily | travel | reading>]
 title: <real localized title>
 summary: <real localized summary>
 updatedAt: <optional ISO-8601 date or timestamp>
 cover: ../../../assets/<optional-web-ready-image>
 coverAlt: <required localized alt text when cover is present>
+leadMedia:
+  type: video
+  src: /media/<local-video.mp4-or-webm>
+  poster: ../../../assets/<web-ready-video-poster>
+  posterAlt: <localized factual poster description>
+  title: <localized media title>
+  captions: /media/<localized-captions.vtt>
 ---
 ```
 
 Replace every angle-bracket value before running the gates. `cover` and
 `coverAlt` must either both be present or both be absent. Keep `draft: true`
 until the text, dates, links, and optional image description are ready to be
-public.
+public. Omit `leadMedia` when there is no real media. For audio, replace the
+video fields with:
+
+```yaml
+leadMedia:
+  type: audio
+  src: /media/<local-audio.mp3-or-m4a>
+  title: <localized media title>
+  transcript: /media/<localized-transcript.html-or-txt>
+```
+
+Video requires a local Astro asset poster and same-origin captions; audio
+requires a same-origin transcript. The native player is rendered only after
+those fields validate.
 
 ### Moment entries
 
-A Moment entry is Markdown and requires at least one real local image:
+A Moment entry is Markdown and requires at least one real local image or one
+real local video:
 
 ```yaml
 ---
@@ -125,17 +147,25 @@ locale: <en | zh | fr>
 translationKey: <lowercase-kebab-case-key>
 publishedAt: <ISO-8601 date or timestamp>
 draft: true
+topics: [<daily | travel | reading>]
 caption: <real localized caption>
 takenAt: <real ISO-8601 date or timestamp>
 location: <optional real localized location>
 images:
   - src: ../../../assets/<web-ready-image>
     alt: <localized factual alt text>
+video:
+  src: /media/<local-video.mp4-or-webm>
+  poster: ../../../assets/<web-ready-video-poster>
+  posterAlt: <localized factual poster description>
+  title: <localized media title>
+  captions: /media/<localized-captions.vtt>
 ---
 ```
 
 Add further `src` and `alt` pairs under `images` when the Moment contains more
-than one photograph. `publishedAt` controls cross-collection chronology;
+than one photograph. For a video-only Moment, omit `images`; for a mixed
+Moment, keep both `images` and `video`. `publishedAt` controls cross-collection chronology;
 `takenAt` describes the photograph and is shown as Moment metadata.
 
 ### Translation behavior
@@ -153,17 +183,20 @@ than one photograph. `publishedAt` controls cross-collection chronology;
   entry's declared locale; do not copy untranslated text merely to fill a
   field.
 
-### Local images and alt text
+### Local media and accessibility text
 
-1. Export a curated, web-ready copy into `src/assets/`. Keep private originals
-   and full-resolution archives outside Git.
-2. Reference the file relative to the entry. The paths above are correct for
+1. Export curated, web-ready image and video-poster copies into `src/assets/`.
+   Keep private originals and full-resolution archives outside Git.
+2. Put media binaries, WebVTT captions, and audio transcripts in `public/media/`.
+   Reference them with a same-origin `/media/` path; remote providers and URLs
+   are not supported.
+3. Reference image assets relative to the entry. The paths above are correct for
    the recommended `<translation-key>/<locale>` layout.
-3. Describe the meaningful visual information in `coverAlt` or each image's
-   `alt`. Localize that description for every translated entry.
-4. Do not repeat a caption word-for-word as alt text. A caption supplies
+4. Describe the meaningful visual information in `coverAlt`, `posterAlt`, or
+   each image's `alt`. Localize that description for every translated entry.
+5. Do not repeat a caption word-for-word as alt text. A caption supplies
    context; alt text communicates what the image shows.
-5. Do not tint, stretch, or manually pre-crop an image to simulate the layout.
+6. Do not tint, stretch, or manually pre-crop an image to simulate the layout.
    Astro reserves the configured ratios and generates the responsive output.
 
 After adding or changing content, run `npm test`, `npm run check`, and

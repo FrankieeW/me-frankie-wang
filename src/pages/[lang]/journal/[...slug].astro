@@ -7,6 +7,7 @@ import {
 } from "astro:content";
 
 import { getEntryPath, type Locale } from "../../../i18n/config.ts";
+import EntryMedia from "../../../components/EntryMedia.astro";
 import EntryLayout from "../../../layouts/EntryLayout.astro";
 import {
   getAvailableTranslations,
@@ -87,6 +88,11 @@ const showTableOfContents = shouldShowTableOfContents(headings);
       <figure slot="cover" class="entry-media">
         <Image src={entry.data.cover} alt={entry.data.coverAlt} />
       </figure>
+    )
+  }
+  {
+    entry.data.leadMedia !== undefined && (
+      <EntryMedia locale={locale} media={entry.data.leadMedia} />
     )
   }
   <Content />

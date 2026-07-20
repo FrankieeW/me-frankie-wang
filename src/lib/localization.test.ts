@@ -24,6 +24,7 @@ test("provides localized discovery interface copy", () => {
       friends: "Friends",
       history: "Site history",
       transcript: "Read transcript",
+      captions: "Captions",
       since: "Since {year}",
     },
     {
@@ -42,6 +43,7 @@ test("provides localized discovery interface copy", () => {
       friends: "朋友们",
       history: "网站沿革",
       transcript: "阅读文字稿",
+      captions: "字幕",
       since: "始于 {year}",
     },
     {
@@ -60,6 +62,7 @@ test("provides localized discovery interface copy", () => {
       friends: "Amis",
       history: "Histoire du site",
       transcript: "Lire la transcription",
+      captions: "Sous-titres",
       since: "Depuis {year}",
     },
   ]);

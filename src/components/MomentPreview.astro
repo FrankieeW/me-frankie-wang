@@ -4,6 +4,7 @@ import type { CollectionEntry } from "astro:content";
 
 import { getEntryPath, type Locale } from "../i18n/config.ts";
 import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import { getMomentPreviewVisual } from "../lib/media.ts";
 import TopicLinks from "./TopicLinks.astro";
 
 type MomentPreviewVariant = "lead" | "square" | "secondary" | "compact";
@@ -16,7 +17,8 @@ interface Props {
 }
 
 const { entry, locale, variant, priority = false } = Astro.props;
-const image = entry.data.images[0];
+const image = getMomentPreviewVisual(entry.data);
+const imageFormat = image?.src.format === "svg" ? "svg" : "avif";
 const copy = UI_TRANSLATIONS[locale];
 const href = getEntryPath(locale, "moments", entry.data.translationKey);
 const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
@@ -41,7 +43,7 @@ const sizes =
           loading={priority ? "eager" : "lazy"}
           fetchpriority={priority ? "high" : undefined}
           decoding="async"
-          format="avif"
+          format={imageFormat}
         />
       )
     }

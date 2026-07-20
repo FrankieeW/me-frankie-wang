@@ -514,6 +514,16 @@ select {
   margin: 0 auto var(--space-10);
 }
 
+.entry-content > .entry-media--video {
+  --entry-video-width: min(
+    var(--content-max),
+    calc(100vw - var(--space-14))
+  );
+  width: var(--entry-video-width);
+  max-width: none;
+  margin-inline: calc((100% - var(--entry-video-width)) / 2);
+}
+
 .entry-media img {
   width: 100%;
   height: auto;
@@ -651,6 +661,10 @@ select {
   .page-shell,
   .entry-shell {
     width: calc(100% - (2 * var(--gutter-mobile)));
+  }
+
+  .entry-content > .entry-media--video {
+    --entry-video-width: calc(100vw - (2 * var(--gutter-mobile)));
   }
 
   .page-shell,

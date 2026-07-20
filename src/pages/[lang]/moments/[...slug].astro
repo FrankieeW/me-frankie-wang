@@ -7,6 +7,7 @@ import {
 } from "astro:content";
 
 import { getEntryPath, type Locale } from "../../../i18n/config.ts";
+import EntryMedia from "../../../components/EntryMedia.astro";
 import EntryLayout from "../../../layouts/EntryLayout.astro";
 import {
   getAvailableTranslations,
@@ -50,6 +51,10 @@ const canonicalPath = getEntryPath(
   entry.data.translationKey,
 );
 const { Content } = await render(entry);
+const video =
+  entry.data.video === undefined
+    ? undefined
+    : { type: "video" as const, ...entry.data.video };
 ---
 
 <EntryLayout
@@ -73,5 +78,6 @@ const { Content } = await render(entry);
       </figure>
     ))
   }
+  {video !== undefined && <EntryMedia locale={locale} media={video} />}
   <Content />
 </EntryLayout>
