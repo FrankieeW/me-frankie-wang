@@ -31,13 +31,15 @@ export const SITE_COPY = {
 } as const satisfies Record<Locale, SiteCopy>;
 
 export const SOCIAL_SERVICE_ORDER = [
-  "rss",
+  "website",
+  "instagram",
   "x",
   "github",
   "telegram",
   "bilibili",
   "email",
   "douban",
+  "rss",
 ] as const;
 
 export type SocialService = (typeof SOCIAL_SERVICE_ORDER)[number];
@@ -48,4 +50,30 @@ export type SocialLink = {
   readonly rel?: "me";
 };
 
-export const SOCIAL_LINKS = [] as const satisfies readonly SocialLink[];
+export const SOCIAL_LINKS = [
+  {
+    service: "website",
+    href: "https://frankie.wang/",
+    rel: "me",
+  },
+  {
+    service: "instagram",
+    href: "https://www.instagram.com/frankiefcw/",
+    rel: "me",
+  },
+  {
+    service: "x",
+    href: "https://x.com/frankiefcw",
+    rel: "me",
+  },
+  {
+    service: "github",
+    href: "https://github.com/FrankieeW",
+    rel: "me",
+  },
+  {
+    service: "email",
+    href: "mailto:me@frankie.wang",
+    rel: "me",
+  },
+] as const satisfies readonly SocialLink[];

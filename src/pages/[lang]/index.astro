@@ -2,6 +2,10 @@
 import { getCollection } from "astro:content";
 
 import EmptyState from "../../components/EmptyState.astro";
+import JournalPreview from "../../components/JournalPreview.astro";
+import MomentPreview from "../../components/MomentPreview.astro";
+import PhotoFrame from "../../components/PhotoFrame.astro";
+import SocialLinks from "../../components/SocialLinks.astro";
 import { SITE_COPY } from "../../data/site.ts";
 import {
   getEntryPath,
@@ -13,6 +17,7 @@ import { UI_TRANSLATIONS } from "../../i18n/translations.ts";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { getPublishedEntries } from "../../lib/content.ts";
 import { getCoreLocalePaths } from "../../lib/seo.ts";
+import "../../styles/home.css";
 
 interface Props {
   readonly locale: Locale;
@@ -29,13 +34,43 @@ const { locale } = Astro.props;
 const copy = UI_TRANSLATIONS[locale];
 const siteCopy = SITE_COPY[locale];
 const paths = getCoreLocalePaths("home");
-const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+const dateFormatter = new Intl.DateTimeFormat(locale, {
+  year: "numeric",
+  month: "long",
+});
 const journalEntries = getPublishedEntries(await getCollection("journal")).filter(
   (entry) => entry.data.locale === locale,
 );
 const momentEntries = getPublishedEntries(await getCollection("moments")).filter(
   (entry) => entry.data.locale === locale,
 );
+const featuredJournal = journalEntries[0];
+const leadMoment = momentEntries[0];
+const squareMoment = momentEntries[1];
+const secondaryMoment = momentEntries[2];
+const scrapbookItemCount =
+  Math.min(momentEntries.length, 3) + (featuredJournal === undefined ? 0 : 1);
+const timelineEntries = [
+  ...journalEntries.map((entry) => ({
+    kind: "journal" as const,
+    href: getEntryPath(locale, "journal", entry.data.translationKey),
+    title: entry.data.title,
+    summary: entry.data.summary,
+    publishedAt: entry.data.publishedAt,
+  })),
+  ...momentEntries.map((entry) => ({
+    kind: "moments" as const,
+    href: getEntryPath(locale, "moments", entry.data.translationKey),
+    title: entry.data.caption,
+    summary: entry.data.location,
+    publishedAt: entry.data.publishedAt,
+  })),
+]
+  .toSorted(
+    (left, right) =>
+      right.publishedAt.getTime() - left.publishedAt.getTime(),
+  )
+  .slice(0, 8);
 ---
 
 <SiteLayout
@@ -47,9 +82,12 @@ const momentEntries = getPublishedEntries(await getCollection("moments")).filter
   switchPaths={paths}
   alternatePaths={paths}
 >
-  <div class="page-shell">
+  <div class="home-grid" aria-hidden="true"></div>
+
+  <div class="home-page" id="top">
     <section class="home-hero" aria-labelledby="home-title">
       <div class="home-hero__copy">
+        <span class="home-eyebrow">{copy.home.indexLabel}</span>
         <h1 id="home-title" aria-label={siteCopy.title}>
           {
             siteCopy.titleLines === undefined ? (
@@ -70,75 +108,167 @@ const momentEntries = getPublishedEntries(await getCollection("moments")).filter
           }
         </h1>
         <p class="home-hero__introduction">{siteCopy.introduction}</p>
+        <nav
+          class="home-directory"
+          aria-label={copy.accessibility.primaryNavigation}
+        >
+          <a href={getLocalizedPath(locale, "journal")}>
+            {copy.navigation.journal}
+            <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path
+                d="M2 10 10 2M4 2h6v6"
+                stroke="currentColor"
+                stroke-width="1.4"
+              />
+            </svg>
+          </a>
+          <a href={getLocalizedPath(locale, "moments")}>
+            {copy.navigation.moments}
+            <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path
+                d="M2 10 10 2M4 2h6v6"
+                stroke="currentColor"
+                stroke-width="1.4"
+              />
+            </svg>
+          </a>
+          <a href={getLocalizedPath(locale, "hello")}>
+            {copy.navigation.hello}
+            <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path
+                d="M2 10 10 2M4 2h6v6"
+                stroke="currentColor"
+                stroke-width="1.4"
+              />
+            </svg>
+          </a>
+        </nav>
+        <SocialLinks locale={locale} />
       </div>
-      <nav class="route-directory" aria-label={copy.accessibility.primaryNavigation}>
-        <a href={getLocalizedPath(locale, "journal")}>{copy.navigation.journal}</a>
-        <a href={getLocalizedPath(locale, "moments")}>{copy.navigation.moments}</a>
-        <a href={getLocalizedPath(locale, "hello")}>{copy.navigation.hello}</a>
-      </nav>
+
+      <div class="home-hero__visual">
+        <PhotoFrame variant="hero" priority />
+      </div>
     </section>
 
-    <div class="home-status">
-      <section class="home-status__section" aria-labelledby="home-journal-title">
-        <h2 class="section-heading" id="home-journal-title">
-          {copy.navigation.journal}
-        </h2>
-        {
-          journalEntries.length === 0 ? (
-            <EmptyState message={copy.emptyState.journal} />
-          ) : (
-            <ul class="entry-list">
-              {journalEntries.slice(0, 3).map((entry) => (
-                <li>
-                  <a
-                    href={getEntryPath(
-                      locale,
-                      "journal",
-                      entry.data.translationKey,
-                    )}
-                  >
-                    {entry.data.title}
-                  </a>
-                  <p>{entry.data.summary}</p>
-                  <time datetime={entry.data.publishedAt.toISOString()}>
-                    {dateFormatter.format(entry.data.publishedAt)}
-                  </time>
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </section>
-
-      <section class="home-status__section" aria-labelledby="home-moments-title">
-        <h2 class="section-heading" id="home-moments-title">
-          {copy.navigation.moments}
-        </h2>
-        {
-          momentEntries.length === 0 ? (
-            <EmptyState message={copy.emptyState.moments} />
-          ) : (
-            <ul class="entry-list">
-              {momentEntries.slice(0, 3).map((entry) => (
-                <li>
-                  <a
-                    href={getEntryPath(
-                      locale,
-                      "moments",
-                      entry.data.translationKey,
-                    )}
-                  >
-                    {entry.data.caption}
-                  </a>
-                  <time datetime={entry.data.takenAt.toISOString()}>
-                    {dateFormatter.format(entry.data.takenAt)}
-                  </time>
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </section>
+    <div class="home-divider" aria-hidden="true">
+      <span>
+        {copy.home.scrapbookLabel}
+        <svg viewBox="0 0 12 12" fill="none">
+          <path
+            d="M6 1v9M2.5 6.5 6 10l3.5-3.5"
+            stroke="currentColor"
+            stroke-width="1.2"
+          />
+        </svg>
+      </span>
     </div>
+
+    <section
+      class="home-section"
+      id="moments"
+      aria-labelledby="scrapbook-title"
+    >
+      <header class="home-section__heading">
+        <div>
+          <span class="home-section__index">{copy.home.scrapbookIndex}</span>
+          <h2 id="scrapbook-title">{copy.home.scrapbookTitle}</h2>
+        </div>
+        <p>{copy.home.scrapbookDescription}</p>
+      </header>
+
+      {
+        scrapbookItemCount === 0 ? (
+          <EmptyState message={copy.emptyState.timeline} />
+        ) : (
+          <div
+            class:list={[
+              "home-scrapbook",
+              { "home-scrapbook--one": scrapbookItemCount === 1 },
+              { "home-scrapbook--two": scrapbookItemCount === 2 },
+            ]}
+          >
+            {leadMoment !== undefined && (
+              <div class="home-scrapbook__lead">
+                <MomentPreview
+                  entry={leadMoment}
+                  locale={locale}
+                  variant="lead"
+                  priority
+                />
+              </div>
+            )}
+            {featuredJournal !== undefined && (
+              <div class="home-scrapbook__journal">
+                <JournalPreview
+                  entry={featuredJournal}
+                  locale={locale}
+                  variant="featured"
+                />
+              </div>
+            )}
+            {squareMoment !== undefined && (
+              <div class="home-scrapbook__square">
+                <MomentPreview
+                  entry={squareMoment}
+                  locale={locale}
+                  variant="square"
+                />
+              </div>
+            )}
+            {secondaryMoment !== undefined && (
+              <div class="home-scrapbook__secondary">
+                <MomentPreview
+                  entry={secondaryMoment}
+                  locale={locale}
+                  variant="secondary"
+                />
+              </div>
+            )}
+          </div>
+        )
+      }
+    </section>
+
+    <section
+      class="home-section home-section--timeline"
+      aria-labelledby="timeline-title"
+    >
+      <header class="home-section__heading">
+        <div>
+          <span class="home-section__index">{copy.home.timelineIndex}</span>
+          <h2 id="timeline-title">{copy.home.timelineTitle}</h2>
+        </div>
+        <p>{copy.home.timelineDescription}</p>
+      </header>
+
+      {
+        timelineEntries.length === 0 ? (
+          <EmptyState message={copy.emptyState.timeline} />
+        ) : (
+          <div class="home-timeline">
+            {timelineEntries.map((entry) => (
+              <a class="home-timeline__row" href={entry.href} aria-label={entry.title}>
+                <span class="home-timeline__dot" aria-hidden="true"></span>
+                <time datetime={entry.publishedAt.toISOString()}>
+                  {dateFormatter.format(entry.publishedAt)}
+                </time>
+                <div class="home-timeline__copy">
+                  <h3>{entry.title}</h3>
+                  {entry.summary !== undefined && <p>{entry.summary}</p>}
+                </div>
+                <span class="home-timeline__kind">
+                  {copy.navigation[entry.kind]}
+                </span>
+              </a>
+            ))}
+          </div>
+        )
+      }
+      <a class="home-back-to-top" href="#top">
+        {copy.home.backToTop}
+        <span aria-hidden="true">↑</span>
+      </a>
+    </section>
   </div>
 </SiteLayout>

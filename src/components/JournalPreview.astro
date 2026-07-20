@@ -1,0 +1,142 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { getEntryPath, type Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+type JournalPreviewVariant = "featured" | "row";
+
+interface Props {
+  readonly entry: CollectionEntry<"journal">;
+  readonly locale: Locale;
+  readonly variant: JournalPreviewVariant;
+}
+
+const { entry, locale, variant } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+const href = getEntryPath(locale, "journal", entry.data.translationKey);
+---
+
+<article class:list={["journal-preview", `journal-preview--${variant}`]}>
+  <a href={href} aria-label={entry.data.title}>
+    <div class="journal-preview__kicker">
+      <span>{copy.navigation.journal}</span>
+      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path
+          d="M2 10 10 2M4 2h6v6"
+          stroke="currentColor"
+          stroke-width="1.4"
+        />
+      </svg>
+    </div>
+    <h3>{entry.data.title}</h3>
+    <p>{entry.data.summary}</p>
+    <time datetime={entry.data.publishedAt.toISOString()}>
+      {dateFormatter.format(entry.data.publishedAt)}
+    </time>
+  </a>
+</article>
+
+<style>
+  .journal-preview,
+  .journal-preview a {
+    position: relative;
+    height: 100%;
+  }
+
+  .journal-preview {
+    overflow: visible;
+  }
+
+  .journal-preview a {
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 18px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: transform var(--motion-card);
+  }
+
+  .journal-preview--featured a::after {
+    content: "";
+    position: absolute;
+    inset: 6px -6px -6px 6px;
+    z-index: -1;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: inherit;
+    transition: transform var(--motion-card);
+  }
+
+  .journal-preview a:hover,
+  .journal-preview a:focus-visible {
+    transform: translate(-4px, -4px);
+  }
+
+  .journal-preview--featured a:hover::after,
+  .journal-preview--featured a:focus-visible::after {
+    transform: translate(8px, 8px);
+  }
+
+  .journal-preview__kicker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--color-quiet);
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  :global([lang="zh"]) .journal-preview__kicker {
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .journal-preview__kicker svg {
+    width: var(--space-3);
+    height: var(--space-3);
+    color: var(--color-accent-ink);
+  }
+
+  h3 {
+    margin: var(--space-8) 0 var(--space-3);
+    font-size: 27px;
+    font-weight: 740;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  time {
+    margin-top: auto;
+    padding-top: var(--space-5);
+    color: var(--color-quiet);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .journal-preview--row a {
+    min-height: 180px;
+  }
+
+  @media (max-width: 680px) {
+    .journal-preview--featured {
+      min-height: 280px;
+    }
+  }
+</style>

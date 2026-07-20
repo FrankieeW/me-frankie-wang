@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  SOCIAL_LINKS,
+  SOCIAL_SERVICE_ORDER,
+} from "../data/site.ts";
+import {
   getLocalizedPath,
   LOCALES,
   parseLocale,
@@ -188,4 +192,81 @@ test("provides a localized home purpose for the visible brand label", () => {
     ),
     ["Home", "首页", "Accueil"],
   );
+});
+
+test("publishes verified social links in the approved service order", () => {
+  // Given
+  const approvedOrder = new Map(
+    SOCIAL_SERVICE_ORDER.map((service, index) => [service, index]),
+  );
+
+  // When
+  const links = SOCIAL_LINKS.map((link) => ({
+    ...link,
+    order: approvedOrder.get(link.service),
+  }));
+
+  // Then
+  assert.deepEqual(links, [
+    {
+      service: "website",
+      href: "https://frankie.wang/",
+      rel: "me",
+      order: 0,
+    },
+    {
+      service: "instagram",
+      href: "https://www.instagram.com/frankiefcw/",
+      rel: "me",
+      order: 1,
+    },
+    {
+      service: "x",
+      href: "https://x.com/frankiefcw",
+      rel: "me",
+      order: 2,
+    },
+    {
+      service: "github",
+      href: "https://github.com/FrankieeW",
+      rel: "me",
+      order: 3,
+    },
+    {
+      service: "email",
+      href: "mailto:me@frankie.wang",
+      rel: "me",
+      order: 6,
+    },
+  ]);
+});
+
+test("provides every localized homepage composition label", () => {
+  // Given
+  const requiredKeys = [
+    "indexLabel",
+    "scrapbookLabel",
+    "scrapbookIndex",
+    "scrapbookTitle",
+    "scrapbookDescription",
+    "timelineIndex",
+    "timelineTitle",
+    "timelineDescription",
+    "backToTop",
+  ];
+
+  // When
+  const keysByLocale = LOCALES.map((locale) => {
+    const translation = UI_TRANSLATIONS[locale];
+    const home =
+      "home" in translation &&
+      typeof translation.home === "object" &&
+      translation.home !== null
+        ? translation.home
+        : {};
+    return Object.keys(home);
+  });
+
+  // Then
+  assert.deepEqual(keysByLocale, LOCALES.map(() => requiredKeys));
 });

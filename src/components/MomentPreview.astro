@@ -1,0 +1,171 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+
+import { getEntryPath, type Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+type MomentPreviewVariant = "lead" | "square" | "secondary" | "compact";
+
+interface Props {
+  readonly entry: CollectionEntry<"moments">;
+  readonly locale: Locale;
+  readonly variant: MomentPreviewVariant;
+  readonly priority?: boolean;
+}
+
+const { entry, locale, variant, priority = false } = Astro.props;
+const image = entry.data.images[0];
+const copy = UI_TRANSLATIONS[locale];
+const href = getEntryPath(locale, "moments", entry.data.translationKey);
+const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+const sizes =
+  variant === "lead"
+    ? "(max-width: 680px) calc(100vw - 44px), (max-width: 1024px) 62vw, 640px"
+    : "(max-width: 680px) calc(100vw - 44px), (max-width: 1024px) 36vw, 360px";
+---
+
+<article class:list={["moment-preview", `moment-preview--${variant}`]}>
+  <a href={href} aria-label={entry.data.caption}>
+    <Image
+      src={image.src}
+      alt={image.alt}
+      widths={[320, 480, 640, 960]}
+      sizes={sizes}
+      loading={priority ? "eager" : "lazy"}
+      fetchpriority={priority ? "high" : undefined}
+      decoding="async"
+      format="avif"
+    />
+    <div class="moment-preview__overlay">
+      <span>{copy.navigation.moments}</span>
+      <time datetime={entry.data.takenAt.toISOString()}>
+        {dateFormatter.format(entry.data.takenAt)}
+      </time>
+    </div>
+    <p>{entry.data.caption}</p>
+  </a>
+</article>
+
+<style>
+  .moment-preview,
+  .moment-preview a {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .moment-preview {
+    overflow: visible;
+  }
+
+  .moment-preview a {
+    display: block;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 18px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: transform var(--motion-card);
+  }
+
+  .moment-preview a::after {
+    content: "";
+    position: absolute;
+    inset: 6px -6px -6px 6px;
+    z-index: -1;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: inherit;
+    transition: transform var(--motion-card);
+  }
+
+  .moment-preview a:hover,
+  .moment-preview a:focus-visible {
+    transform: translate(-4px, -4px);
+  }
+
+  .moment-preview a:hover::after,
+  .moment-preview a:focus-visible::after {
+    transform: translate(8px, 8px);
+  }
+
+  .moment-preview--lead a,
+  .moment-preview--lead :global(img) {
+    aspect-ratio: 16 / 10;
+  }
+
+  .moment-preview--square a,
+  .moment-preview--square :global(img) {
+    aspect-ratio: 1;
+  }
+
+  .moment-preview--secondary a,
+  .moment-preview--secondary :global(img) {
+    aspect-ratio: 4 / 3;
+  }
+
+  .moment-preview--compact a,
+  .moment-preview--compact :global(img) {
+    aspect-ratio: 16 / 10;
+  }
+
+  .moment-preview :global(img) {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+
+  .moment-preview__overlay,
+  p {
+    position: absolute;
+    z-index: 2;
+    right: var(--space-4);
+    left: var(--space-4);
+  }
+
+  .moment-preview__overlay {
+    top: var(--space-4);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    color: var(--color-paper);
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgb(11 12 15 / 70%);
+  }
+
+  :global([lang="zh"]) .moment-preview__overlay {
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  p {
+    bottom: var(--space-4);
+    margin: 0;
+    padding: var(--space-3);
+    background: color-mix(in srgb, var(--color-ink) 82%, transparent);
+    color: var(--color-paper);
+    font-size: 14px;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 680px) {
+    .moment-preview--lead a,
+    .moment-preview--lead :global(img) {
+      aspect-ratio: 1.12;
+    }
+
+    .moment-preview--secondary a,
+    .moment-preview--secondary :global(img) {
+      aspect-ratio: 9 / 10;
+    }
+  }
+</style>

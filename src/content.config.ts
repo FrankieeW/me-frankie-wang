@@ -47,20 +47,18 @@ const moments = defineCollection({
     base: "./src/content/moments",
     pattern: "**/*.md",
   }),
-  schema: ({ image }) =>
-    sharedMetadata.extend({
+  schema: ({ image }) => {
+    const imageSchema = z.object({
+      src: image(),
+      alt: requiredText,
+    });
+    return sharedMetadata.extend({
       caption: requiredText,
       takenAt: z.coerce.date(),
       location: requiredText.optional(),
-      images: z
-        .array(
-          z.object({
-            src: image(),
-            alt: requiredText,
-          }),
-        )
-        .min(1),
-    }),
+      images: z.tuple([imageSchema]).rest(imageSchema),
+    });
+  },
 });
 
 export const collections = { journal, moments };

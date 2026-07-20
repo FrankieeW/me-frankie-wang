@@ -1,4 +1,5 @@
 ---
+import SocialLinks from "../../../components/SocialLinks.astro";
 import { SITE_COPY } from "../../../data/site.ts";
 import { LOCALES, type Locale } from "../../../i18n/config.ts";
 import { UI_TRANSLATIONS } from "../../../i18n/translations.ts";
@@ -35,6 +36,7 @@ const paths = getCoreLocalePaths("hello");
     <header class="page-header">
       <h1>{copy.navigation.hello}</h1>
       <p>{siteCopy.introduction}</p>
+      <SocialLinks locale={locale} />
     </header>
   </div>
 </SiteLayout>

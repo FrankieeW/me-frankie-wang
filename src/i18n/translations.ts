@@ -4,6 +4,17 @@ type NavigationRoute = Exclude<LocalizedRoute, "home">;
 
 type UiTranslations = {
   readonly navigation: Readonly<Record<NavigationRoute, string>>;
+  readonly home: {
+    readonly indexLabel: string;
+    readonly scrapbookLabel: string;
+    readonly scrapbookIndex: string;
+    readonly scrapbookTitle: string;
+    readonly scrapbookDescription: string;
+    readonly timelineIndex: string;
+    readonly timelineTitle: string;
+    readonly timelineDescription: string;
+    readonly backToTop: string;
+  };
   readonly accessibility: {
     readonly skipToContent: string;
     readonly primaryNavigation: string;
@@ -11,6 +22,7 @@ type UiTranslations = {
     readonly openMenu: string;
     readonly closeMenu: string;
     readonly homeLink: string;
+    readonly socialNavigation: string;
   };
   readonly metadata: {
     readonly published: string;
@@ -32,6 +44,19 @@ export const UI_TRANSLATIONS = {
       moments: "Moments",
       hello: "Hello",
     },
+    home: {
+      indexLabel: "Personal index / 001",
+      scrapbookLabel: "Living scrapbook",
+      scrapbookIndex: "01 / Moments",
+      scrapbookTitle: "A living scrapbook.",
+      scrapbookDescription:
+        "Photographs lead here; notes and smaller fragments follow when there is something real to share.",
+      timelineIndex: "02 / In order",
+      timelineTitle: "The same life, in time.",
+      timelineDescription:
+        "A quieter chronological view of public moments and notes.",
+      backToTop: "Back to the beginning",
+    },
     accessibility: {
       skipToContent: "Skip to content",
       primaryNavigation: "Primary navigation",
@@ -39,6 +64,7 @@ export const UI_TRANSLATIONS = {
       openMenu: "Open navigation menu",
       closeMenu: "Close navigation menu",
       homeLink: "Home",
+      socialNavigation: "Social links",
     },
     metadata: {
       published: "Published",
@@ -58,6 +84,18 @@ export const UI_TRANSLATIONS = {
       moments: "片刻",
       hello: "你好",
     },
+    home: {
+      indexLabel: "个人索引 / 001",
+      scrapbookLabel: "生活拼贴",
+      scrapbookIndex: "01 / 片刻",
+      scrapbookTitle: "一册生活拼贴。",
+      scrapbookDescription:
+        "照片在前，随笔与零散片段只在有真实内容时出现。",
+      timelineIndex: "02 / 按时间",
+      timelineTitle: "同一段生活，按时间展开。",
+      timelineDescription: "用更安静的时间顺序浏览公开的片刻与随笔。",
+      backToTop: "回到开头",
+    },
     accessibility: {
       skipToContent: "跳到正文",
       primaryNavigation: "主导航",
@@ -65,6 +103,7 @@ export const UI_TRANSLATIONS = {
       openMenu: "打开导航菜单",
       closeMenu: "关闭导航菜单",
       homeLink: "首页",
+      socialNavigation: "社交链接",
     },
     metadata: {
       published: "发布于",
@@ -84,6 +123,19 @@ export const UI_TRANSLATIONS = {
       moments: "Instants",
       hello: "Bonjour",
     },
+    home: {
+      indexLabel: "Index personnel / 001",
+      scrapbookLabel: "Carnet vivant",
+      scrapbookIndex: "01 / Instants",
+      scrapbookTitle: "Un carnet vivant.",
+      scrapbookDescription:
+        "Les photographies ouvrent la voie ; les notes et fragments suivent lorsqu’il y a quelque chose de réel à partager.",
+      timelineIndex: "02 / Chronologie",
+      timelineTitle: "La même vie, dans le temps.",
+      timelineDescription:
+        "Une vue chronologique plus calme des instants et textes publics.",
+      backToTop: "Retour au début",
+    },
     accessibility: {
       skipToContent: "Aller au contenu",
       primaryNavigation: "Navigation principale",
@@ -91,6 +143,7 @@ export const UI_TRANSLATIONS = {
       openMenu: "Ouvrir le menu de navigation",
       closeMenu: "Fermer le menu de navigation",
       homeLink: "Accueil",
+      socialNavigation: "Liens sociaux",
     },
     metadata: {
       published: "Publié le",

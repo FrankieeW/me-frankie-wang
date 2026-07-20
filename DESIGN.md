@@ -139,13 +139,15 @@ non-text contrast against white.
 
 | Service | Token | Value |
 | --- | --- | --- |
-| RSS | `--social-rss` | `#B45309` |
+| Academic website | `--social-website` | `#175CD3` |
+| Instagram | `--social-instagram` | `#C13584` |
 | X | `--social-x` | `var(--color-ink)` |
 | GitHub | `--social-github` | `var(--color-ink)` |
 | Telegram | `--social-telegram` | `#0369A1` |
 | Bilibili | `--social-bilibili` | `#0E7490` |
 | Email | `--social-email` | `#B91C1C` |
 | Douban | `--social-douban` | `#15803D` |
+| RSS | `--social-rss` | `#B45309` |
 
 ### Color rules
 
@@ -357,19 +359,24 @@ may remain within its page; one used twice becomes a reusable primitive.
 
 - **Structure:** a labelled navigation group of inline anchors with a 20px
   inline SVG or the single text glyph `豆`, plus visually hidden service names.
-- **Supported order:** RSS, X, GitHub, Telegram, Bilibili, Email, Douban.
+- **Supported order:** academic website, Instagram, X, GitHub, Telegram,
+  Bilibili, Email, Douban, RSS.
 - **Content rule:** render only entries whose real URL or email address is
   configured in `src/data/site.ts`. If none are configured, omit the group.
   Prototype `#social-links` destinations never ship.
+- **Verified configuration:** `https://frankie.wang/`, Instagram
+  `@frankiefcw`, X `@frankiefcw`, GitHub `FrankieeW`, and
+  `mailto:me@frankie.wang`.
 - **Link behavior:** normal same-tab navigation; email uses `mailto:`. Apply
   `rel="me"` where semantically valid. Do not surprise visitors with a new tab.
 - **States:** resting icon is quiet gray; hover/focus uses its accessible
   brand-derived color, translates upward 2px, and reveals a text tooltip.
   Active returns toward rest.
 - **Sizing:** 32×32px on fine pointers. On coarse pointers the transparent hit
-  area is at least 44×44px while the icon stays 20px; the seven-item row must
-  fit within the 331px content width at 375px. Use a 7px gap on fine pointers
-  and a maximum 3px gap on coarse pointers.
+  area is at least 44×44px while the icon stays 20px; the current five-item row
+  must fit within the 331px content width at 375px. Use a 7px gap on fine
+  pointers and a maximum 3px gap on coarse pointers; future configured items
+  wrap rather than overflow.
 - **Tooltip:** appears on hover and keyboard focus, 1px ink border, 5px radius,
   2px hard shadow. The first tooltip is left-aligned to avoid viewport clipping.
   It repeats, but never replaces, the accessible name.
@@ -546,7 +553,6 @@ space, 1px lines, and one hard offset layer; soft shadows are rare.
 | Item | Location | Why accepted | Owner / exit condition |
 | --- | --- | --- | --- |
 | Real personal photography is not yet supplied | Hero and Moments | The plan forbids invention; a truthful abstract hero and localized empty state are safer | Frankie supplies curated web-ready images and localized alt text |
-| Social account URLs are not yet supplied | `SocialLinks` data | The user approved the icon set, not fabricated handles | Frankie supplies each desired URL/address; unconfigured icons remain absent |
 | Real-photo crop behavior has only been proven with abstract stand-ins | PhotoFrame variants | Task 1 validates geometry, not unknown future photographs | Re-run visual QA when the first real images are added |
 
 No accessibility debt is accepted. Any implementation finding that affects
