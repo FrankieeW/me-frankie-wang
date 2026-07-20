@@ -129,7 +129,7 @@ export const UI_TRANSLATIONS = {
       scrapbookIndex: "01 / Instants",
       scrapbookTitle: "Un carnet vivant.",
       scrapbookDescription:
-        "Les photographies ouvrent la voie ; les notes et fragments suivent lorsqu’il y a quelque chose de réel à partager.",
+        "Les photographies ouvrent la voie ; les\u00a0notes et fragments suivent lorsqu’il y a quelque chose de réel à partager.",
       timelineIndex: "02 / Chronologie",
       timelineTitle: "La même vie, dans le temps.",
       timelineDescription:

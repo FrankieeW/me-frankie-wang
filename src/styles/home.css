@@ -100,7 +100,7 @@
   color: var(--color-body);
   font-size: 18px;
   line-height: 1.58;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .home-directory {
@@ -223,7 +223,7 @@
   color: var(--color-muted);
   font-size: 15px;
   line-height: 1.65;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .home-scrapbook {
