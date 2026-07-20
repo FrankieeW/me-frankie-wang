@@ -1,0 +1,24 @@
+---
+import { getLocalizedPath, type Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+interface Props {
+  readonly locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <a class="site-footer__name" href={getLocalizedPath(locale, "home")}>
+      me.frankie.wang
+    </a>
+    <a href={getLocalizedPath(locale, "hello")}>
+      {UI_TRANSLATIONS[locale].navigation.hello}
+    </a>
+    <span class="site-footer__locales" aria-label="English, 中文, Français">
+      EN / 中 / FR
+    </span>
+  </div>
+</footer>

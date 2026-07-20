@@ -234,6 +234,13 @@ Semantic component values such as the 76px desktop hero gap and 86px section
 divider breathing room are documented with those components; they are not
 general-purpose spacing options.
 
+### Semantic control tokens
+
+| Token | Value | Usage |
+| --- | --- | --- |
+| `--control-min-size` | 44px | Minimum primary control hit area on coarse pointers |
+| `--menu-stroke-width` | 2px | Mobile navigation-toggle glyph strokes |
+
 ### Widths and breakpoints
 
 | Token / range | Value | Behavior |

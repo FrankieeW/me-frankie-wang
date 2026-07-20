@@ -1,0 +1,144 @@
+---
+import { getCollection } from "astro:content";
+
+import EmptyState from "../../components/EmptyState.astro";
+import { SITE_COPY } from "../../data/site.ts";
+import {
+  getEntryPath,
+  getLocalizedPath,
+  LOCALES,
+  type Locale,
+} from "../../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../../i18n/translations.ts";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { getPublishedEntries } from "../../lib/content.ts";
+import { getCoreLocalePaths } from "../../lib/seo.ts";
+
+interface Props {
+  readonly locale: Locale;
+}
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { lang: locale },
+    props: { locale },
+  }));
+}
+
+const { locale } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const siteCopy = SITE_COPY[locale];
+const paths = getCoreLocalePaths("home");
+const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+const journalEntries = getPublishedEntries(await getCollection("journal")).filter(
+  (entry) => entry.data.locale === locale,
+);
+const momentEntries = getPublishedEntries(await getCollection("moments")).filter(
+  (entry) => entry.data.locale === locale,
+);
+---
+
+<SiteLayout
+  locale={locale}
+  route="home"
+  title={siteCopy.title}
+  description={siteCopy.introduction}
+  canonicalPath={paths[locale]}
+  switchPaths={paths}
+  alternatePaths={paths}
+>
+  <div class="page-shell">
+    <section class="home-hero" aria-labelledby="home-title">
+      <div class="home-hero__copy">
+        <h1 id="home-title" aria-label={siteCopy.title}>
+          {
+            siteCopy.titleLines === undefined ? (
+              siteCopy.title
+            ) : (
+              siteCopy.titleLines.map((line, index) => (
+                <span
+                  class:list={[
+                    "home-hero__title-line",
+                    { "home-hero__title-line--subject": index === 1 },
+                  ]}
+                  aria-hidden="true"
+                >
+                  {line}
+                </span>
+              ))
+            )
+          }
+        </h1>
+        <p class="home-hero__introduction">{siteCopy.introduction}</p>
+      </div>
+      <nav class="route-directory" aria-label={copy.accessibility.primaryNavigation}>
+        <a href={getLocalizedPath(locale, "journal")}>{copy.navigation.journal}</a>
+        <a href={getLocalizedPath(locale, "moments")}>{copy.navigation.moments}</a>
+        <a href={getLocalizedPath(locale, "hello")}>{copy.navigation.hello}</a>
+      </nav>
+    </section>
+
+    <div class="home-status">
+      <section class="home-status__section" aria-labelledby="home-journal-title">
+        <h2 class="section-heading" id="home-journal-title">
+          {copy.navigation.journal}
+        </h2>
+        {
+          journalEntries.length === 0 ? (
+            <EmptyState message={copy.emptyState.journal} />
+          ) : (
+            <ul class="entry-list">
+              {journalEntries.slice(0, 3).map((entry) => (
+                <li>
+                  <a
+                    href={getEntryPath(
+                      locale,
+                      "journal",
+                      entry.data.translationKey,
+                    )}
+                  >
+                    {entry.data.title}
+                  </a>
+                  <p>{entry.data.summary}</p>
+                  <time datetime={entry.data.publishedAt.toISOString()}>
+                    {dateFormatter.format(entry.data.publishedAt)}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+
+      <section class="home-status__section" aria-labelledby="home-moments-title">
+        <h2 class="section-heading" id="home-moments-title">
+          {copy.navigation.moments}
+        </h2>
+        {
+          momentEntries.length === 0 ? (
+            <EmptyState message={copy.emptyState.moments} />
+          ) : (
+            <ul class="entry-list">
+              {momentEntries.slice(0, 3).map((entry) => (
+                <li>
+                  <a
+                    href={getEntryPath(
+                      locale,
+                      "moments",
+                      entry.data.translationKey,
+                    )}
+                  >
+                    {entry.data.caption}
+                  </a>
+                  <time datetime={entry.data.takenAt.toISOString()}>
+                    {dateFormatter.format(entry.data.takenAt)}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+    </div>
+  </div>
+</SiteLayout>

@@ -1,0 +1,133 @@
+---
+import {
+  getLocalizedPath,
+  type Locale,
+  type LocalizedRoute,
+} from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import type { LocalePathMap } from "../lib/seo.ts";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+
+interface Props {
+  readonly locale: Locale;
+  readonly route: LocalizedRoute;
+  readonly switchPaths: LocalePathMap;
+}
+
+const { locale, route, switchPaths } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const navigationRoutes = ["journal", "moments", "hello"] as const;
+const mobileNavigationId = `mobile-navigation-${locale}`;
+---
+
+<header class="site-header" data-site-header>
+  <div class="site-header__inner">
+    <a
+      class="brand"
+      href={getLocalizedPath(locale, "home")}
+      aria-current={route === "home" ? "page" : undefined}
+    >
+      <span class="brand__mark">F</span>
+      <span class="brand__name">me.frankie.wang</span>
+      <span class="visually-hidden">{copy.accessibility.homeLink}</span>
+    </a>
+
+    <nav
+      class="primary-navigation"
+      aria-label={copy.accessibility.primaryNavigation}
+    >
+      {
+        navigationRoutes.map((navigationRoute) => (
+          <a
+            href={getLocalizedPath(locale, navigationRoute)}
+            aria-current={route === navigationRoute ? "page" : undefined}
+          >
+            {copy.navigation[navigationRoute]}
+          </a>
+        ))
+      }
+    </nav>
+
+    <LanguageSwitcher locale={locale} paths={switchPaths} />
+
+    <button
+      class="mobile-navigation-toggle"
+      type="button"
+      aria-controls={mobileNavigationId}
+      aria-expanded="false"
+      aria-label={copy.accessibility.openMenu}
+      data-mobile-navigation-toggle
+      data-open-label={copy.accessibility.openMenu}
+      data-close-label={copy.accessibility.closeMenu}
+    >
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav
+      class="mobile-navigation"
+      id={mobileNavigationId}
+      aria-label={copy.accessibility.primaryNavigation}
+      data-mobile-navigation
+      hidden
+    >
+      {
+        navigationRoutes.map((navigationRoute) => (
+          <a
+            href={getLocalizedPath(locale, navigationRoute)}
+            aria-current={route === navigationRoute ? "page" : undefined}
+          >
+            {copy.navigation[navigationRoute]}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<script>
+  const desktopNavigation = window.matchMedia("(min-width: 681px)");
+
+  for (const header of document.querySelectorAll<HTMLElement>(
+    "[data-site-header]",
+  )) {
+    const button = header.querySelector<HTMLButtonElement>(
+      "[data-mobile-navigation-toggle]",
+    );
+    const panel = header.querySelector<HTMLElement>("[data-mobile-navigation]");
+
+    if (button === null || panel === null) {
+      continue;
+    }
+
+    const openLabel = button.dataset["openLabel"] ?? "Open menu";
+    const closeLabel = button.dataset["closeLabel"] ?? "Close menu";
+
+    const setOpen = (isOpen: boolean) => {
+      button.setAttribute("aria-expanded", String(isOpen));
+      button.setAttribute("aria-label", isOpen ? closeLabel : openLabel);
+      panel.hidden = !isOpen;
+    };
+
+    button.addEventListener("click", () => {
+      setOpen(button.getAttribute("aria-expanded") !== "true");
+    });
+
+    panel.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    header.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !panel.hidden) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+
+    desktopNavigation.addEventListener("change", (event) => {
+      if (event.matches) {
+        setOpen(false);
+      }
+    });
+  }
+</script>

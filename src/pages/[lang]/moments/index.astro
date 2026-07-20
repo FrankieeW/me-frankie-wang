@@ -1,0 +1,76 @@
+---
+import { getCollection } from "astro:content";
+
+import EmptyState from "../../../components/EmptyState.astro";
+import { SITE_COPY } from "../../../data/site.ts";
+import {
+  getEntryPath,
+  LOCALES,
+  type Locale,
+} from "../../../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../../../i18n/translations.ts";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import { getPublishedEntries } from "../../../lib/content.ts";
+import { getCoreLocalePaths } from "../../../lib/seo.ts";
+
+interface Props {
+  readonly locale: Locale;
+}
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { lang: locale },
+    props: { locale },
+  }));
+}
+
+const { locale } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const paths = getCoreLocalePaths("moments");
+const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+const entries = getPublishedEntries(await getCollection("moments")).filter(
+  (entry) => entry.data.locale === locale,
+);
+---
+
+<SiteLayout
+  locale={locale}
+  route="moments"
+  title={copy.navigation.moments}
+  description={SITE_COPY[locale].introduction}
+  canonicalPath={paths[locale]}
+  switchPaths={paths}
+  alternatePaths={paths}
+>
+  <div class="page-shell">
+    <header class="page-header">
+      <h1>{copy.navigation.moments}</h1>
+    </header>
+    <section class="content-section" aria-label={copy.navigation.moments}>
+      {
+        entries.length === 0 ? (
+          <EmptyState message={copy.emptyState.moments} />
+        ) : (
+          <ol class="entry-list">
+            {entries.map((entry) => (
+              <li>
+                <a
+                  href={getEntryPath(
+                    locale,
+                    "moments",
+                    entry.data.translationKey,
+                  )}
+                >
+                  {entry.data.caption}
+                </a>
+                <time datetime={entry.data.takenAt.toISOString()}>
+                  {dateFormatter.format(entry.data.takenAt)}
+                </time>
+              </li>
+            ))}
+          </ol>
+        )
+      }
+    </section>
+  </div>
+</SiteLayout>

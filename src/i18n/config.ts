@@ -10,7 +10,15 @@ export const LOCALE_LABELS = {
   fr: "FR",
 } as const satisfies Record<Locale, string>;
 
+export const LOCALE_NAMES = {
+  en: "English",
+  zh: "中文",
+  fr: "Français",
+} as const satisfies Record<Locale, string>;
+
 export type LocalizedRoute = "home" | "journal" | "moments" | "hello";
+
+export type EntryRoute = Extract<LocalizedRoute, "journal" | "moments">;
 
 const ROUTE_SEGMENTS = {
   home: "",
@@ -29,4 +37,12 @@ export function getLocalizedPath(
 ): string {
   const segment = ROUTE_SEGMENTS[route];
   return segment === "" ? `/${locale}/` : `/${locale}/${segment}/`;
+}
+
+export function getEntryPath(
+  locale: Locale,
+  route: EntryRoute,
+  translationKey: string,
+): string {
+  return `${getLocalizedPath(locale, route)}${translationKey}/`;
 }

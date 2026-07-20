@@ -1,0 +1,42 @@
+---
+import {
+  LOCALES,
+  LOCALE_LABELS,
+  LOCALE_NAMES,
+  type Locale,
+} from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import type { LocalePathMap } from "../lib/seo.ts";
+
+interface Props {
+  readonly locale: Locale;
+  readonly paths: LocalePathMap;
+}
+
+const { locale, paths } = Astro.props;
+---
+
+<nav
+  class="language-switcher"
+  aria-label={UI_TRANSLATIONS[locale].accessibility.languageNavigation}
+>
+  {
+    LOCALES.map((targetLocale, index) => (
+      <>
+        {index > 0 && (
+          <span class="language-switcher__separator" aria-hidden="true">/</span>
+        )}
+        <a
+          class="language-switcher__link"
+          href={paths[targetLocale]}
+          hreflang={targetLocale}
+          lang={targetLocale}
+          aria-label={LOCALE_NAMES[targetLocale]}
+          aria-current={targetLocale === locale ? "page" : undefined}
+        >
+          {LOCALE_LABELS[targetLocale]}
+        </a>
+      </>
+    ))
+  }
+</nav>

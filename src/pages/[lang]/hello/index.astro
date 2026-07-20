@@ -1,0 +1,40 @@
+---
+import { SITE_COPY } from "../../../data/site.ts";
+import { LOCALES, type Locale } from "../../../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../../../i18n/translations.ts";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import { getCoreLocalePaths } from "../../../lib/seo.ts";
+
+interface Props {
+  readonly locale: Locale;
+}
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { lang: locale },
+    props: { locale },
+  }));
+}
+
+const { locale } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const siteCopy = SITE_COPY[locale];
+const paths = getCoreLocalePaths("hello");
+---
+
+<SiteLayout
+  locale={locale}
+  route="hello"
+  title={copy.navigation.hello}
+  description={siteCopy.introduction}
+  canonicalPath={paths[locale]}
+  switchPaths={paths}
+  alternatePaths={paths}
+>
+  <div class="page-shell">
+    <header class="page-header">
+      <h1>{copy.navigation.hello}</h1>
+      <p>{siteCopy.introduction}</p>
+    </header>
+  </div>
+</SiteLayout>

@@ -3,13 +3,20 @@ import test from "node:test";
 
 import {
   getLocalizedPath,
+  LOCALES,
   parseLocale,
   type Locale,
 } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
 import {
   getAvailableTranslations,
   getPublishedEntries,
 } from "./content.ts";
+import {
+  getCanonicalUrl,
+  getCoreLocalePaths,
+  getEntryLocalePaths,
+} from "./seo.ts";
 
 type TestEntry = {
   readonly id: string;
@@ -123,5 +130,62 @@ test("returns public translations in supported locale order", () => {
   assert.deepEqual(
     translations.map((entry) => entry.data.locale),
     ["en", "fr"],
+  );
+});
+
+test("preserves equivalent routes on core-page language switches", () => {
+  // Given
+  const route = "journal";
+
+  // When
+  const paths = getCoreLocalePaths(route);
+
+  // Then
+  assert.deepEqual(paths, {
+    en: "/en/journal/",
+    zh: "/zh/journal/",
+    fr: "/fr/journal/",
+  });
+});
+
+test("falls back missing entry translations without publishing false alternates", () => {
+  // Given
+  const availableLocales = ["en", "fr"] as const;
+
+  // When
+  const paths = getEntryLocalePaths("moments", "weekend", availableLocales);
+
+  // Then
+  assert.deepEqual(paths, {
+    switchPaths: {
+      en: "/en/moments/weekend/",
+      zh: "/zh/moments/",
+      fr: "/fr/moments/weekend/",
+    },
+    alternatePaths: {
+      en: "/en/moments/weekend/",
+      zh: undefined,
+      fr: "/fr/moments/weekend/",
+    },
+  });
+});
+
+test("builds canonical URLs from the configured production origin", () => {
+  // Given
+  const localizedPath = "/zh/hello/";
+
+  // When
+  const canonicalUrl = getCanonicalUrl(localizedPath);
+
+  // Then
+  assert.equal(canonicalUrl, "https://me.frankie.wang/zh/hello/");
+});
+
+test("provides a localized home purpose for the visible brand label", () => {
+  assert.deepEqual(
+    LOCALES.map(
+      (locale) => UI_TRANSLATIONS[locale].accessibility.homeLink,
+    ),
+    ["Home", "首页", "Accueil"],
   );
 });

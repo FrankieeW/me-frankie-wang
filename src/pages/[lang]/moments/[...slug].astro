@@ -1,0 +1,76 @@
+---
+import { Image } from "astro:assets";
+import {
+  getCollection,
+  render,
+  type CollectionEntry,
+} from "astro:content";
+
+import { getEntryPath, type Locale } from "../../../i18n/config.ts";
+import EntryLayout from "../../../layouts/EntryLayout.astro";
+import {
+  getAvailableTranslations,
+  getPublishedEntries,
+} from "../../../lib/content.ts";
+import { getEntryLocalePaths } from "../../../lib/seo.ts";
+
+interface Props {
+  readonly entry: CollectionEntry<"moments">;
+  readonly availableLocales: readonly Locale[];
+}
+
+export async function getStaticPaths() {
+  const entries = getPublishedEntries(await getCollection("moments"));
+
+  return entries.map((entry) => ({
+    params: {
+      lang: entry.data.locale,
+      slug: entry.data.translationKey,
+    },
+    props: {
+      entry,
+      availableLocales: getAvailableTranslations(
+        entries,
+        entry.data.translationKey,
+      ).map((translation) => translation.data.locale),
+    },
+  }));
+}
+
+const { entry, availableLocales } = Astro.props;
+const locale = entry.data.locale;
+const paths = getEntryLocalePaths(
+  "moments",
+  entry.data.translationKey,
+  availableLocales,
+);
+const canonicalPath = getEntryPath(
+  locale,
+  "moments",
+  entry.data.translationKey,
+);
+const { Content } = await render(entry);
+---
+
+<EntryLayout
+  locale={locale}
+  section="moments"
+  title={entry.data.caption}
+  description={entry.data.caption}
+  canonicalPath={canonicalPath}
+  switchPaths={paths.switchPaths}
+  alternatePaths={paths.alternatePaths}
+  date={entry.data.takenAt}
+  dateKind="taken"
+  updatedAt={undefined}
+  location={entry.data.location}
+>
+  {
+    entry.data.images.map((image) => (
+      <figure class="entry-media">
+        <Image src={image.src} alt={image.alt} />
+      </figure>
+    ))
+  }
+  <Content />
+</EntryLayout>

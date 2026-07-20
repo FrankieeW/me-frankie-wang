@@ -2,6 +2,7 @@ import type { Locale } from "../i18n/config.ts";
 
 type SiteCopy = {
   readonly title: string;
+  readonly titleLines: readonly [string, string] | undefined;
   readonly introduction: string;
 };
 
@@ -13,14 +14,17 @@ export const SITE = {
 export const SITE_COPY = {
   en: {
     title: "Hi, I’m Frankie.",
+    titleLines: undefined,
     introduction: "A small place for life, photographs, and notes.",
   },
   zh: {
     title: "你好，我是 Frankie。",
+    titleLines: ["你好，", "我是 Frankie。"],
     introduction: "记录生活、照片与随笔的一小块地方。",
   },
   fr: {
     title: "Bonjour, je suis Frankie.",
+    titleLines: ["Bonjour,", "je suis Frankie."],
     introduction:
       "Un petit espace pour la vie, les photographies et les notes.",
   },

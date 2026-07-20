@@ -1,0 +1,92 @@
+---
+import {
+  getLocalizedPath,
+  type Locale,
+  type EntryRoute,
+} from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import type {
+  AlternatePathMap,
+  LocalePathMap,
+} from "../lib/seo.ts";
+import SiteLayout from "./SiteLayout.astro";
+
+interface Props {
+  readonly locale: Locale;
+  readonly section: EntryRoute;
+  readonly title: string;
+  readonly description: string;
+  readonly canonicalPath: string;
+  readonly switchPaths: LocalePathMap;
+  readonly alternatePaths: AlternatePathMap;
+  readonly date: Date;
+  readonly dateKind: "published" | "taken";
+  readonly updatedAt: Date | undefined;
+  readonly location: string | undefined;
+}
+
+const {
+  locale,
+  section,
+  title,
+  description,
+  canonicalPath,
+  switchPaths,
+  alternatePaths,
+  date,
+  dateKind,
+  updatedAt,
+  location,
+} = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
+---
+
+<SiteLayout
+  locale={locale}
+  route={section}
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  switchPaths={switchPaths}
+  alternatePaths={alternatePaths}
+>
+  <article class="entry-shell">
+    <header class="entry-header">
+      <a class="entry-header__back" href={getLocalizedPath(locale, section)}>
+        {copy.navigation[section]}
+      </a>
+      <h1>{title}</h1>
+      <p class="entry-header__description">{description}</p>
+      <dl class="entry-metadata">
+        <div>
+          <dt>{copy.metadata[dateKind]}</dt>
+          <dd><time datetime={date.toISOString()}>{dateFormatter.format(date)}</time></dd>
+        </div>
+        {
+          updatedAt !== undefined && (
+            <div>
+              <dt>{copy.metadata.updated}</dt>
+              <dd>
+                <time datetime={updatedAt.toISOString()}>
+                  {dateFormatter.format(updatedAt)}
+                </time>
+              </dd>
+            </div>
+          )
+        }
+        {
+          location !== undefined && (
+            <div>
+              <dt>{copy.metadata.location}</dt>
+              <dd>{location}</dd>
+            </div>
+          )
+        }
+      </dl>
+    </header>
+    <div class="entry-content">
+      <slot />
+    </div>
+  </article>
+</SiteLayout>
