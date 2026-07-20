@@ -44,6 +44,12 @@ export const SOCIAL_SERVICE_ORDER = [
 
 export type SocialService = (typeof SOCIAL_SERVICE_ORDER)[number];
 
+type SocialLinkConfiguration = {
+  readonly service: SocialService;
+  readonly href: string | Readonly<Record<Locale, string>>;
+  readonly rel?: "me";
+};
+
 export type SocialLink = {
   readonly service: SocialService;
   readonly href: string;
@@ -76,4 +82,26 @@ export const SOCIAL_LINKS = [
     href: "mailto:me@frankie.wang",
     rel: "me",
   },
-] as const satisfies readonly SocialLink[];
+  {
+    service: "rss",
+    href: {
+      en: "/en/feed.xml",
+      zh: "/zh/feed.xml",
+      fr: "/fr/feed.xml",
+    },
+  },
+] as const satisfies readonly SocialLinkConfiguration[];
+
+export function getSocialLinks(locale: Locale): readonly SocialLink[] {
+  const configuredLinks: readonly SocialLinkConfiguration[] = SOCIAL_LINKS;
+
+  return SOCIAL_SERVICE_ORDER.flatMap((service) =>
+    configuredLinks
+      .filter((link) => link.service === service)
+      .map((link) => ({
+        service: link.service,
+        href: typeof link.href === "string" ? link.href : link.href[locale],
+        ...(link.rel === undefined ? {} : { rel: link.rel }),
+      })),
+  );
+}

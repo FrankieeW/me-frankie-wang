@@ -52,3 +52,7 @@ export function getEntryPath(
 export function getTopicPath(locale: Locale, topic: TopicKey): string {
   return `/${locale}/topics/${topic}/`;
 }
+
+export function getFeedPath(locale: Locale): string {
+  return `/${locale}/feed.xml`;
+}

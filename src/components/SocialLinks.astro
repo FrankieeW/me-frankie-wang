@@ -1,8 +1,6 @@
 ---
 import {
-  SOCIAL_LINKS,
-  SOCIAL_SERVICE_ORDER,
-  type SocialLink,
+  getSocialLinks,
   type SocialService,
 } from "../data/site.ts";
 import type { Locale } from "../i18n/config.ts";
@@ -25,10 +23,7 @@ const SERVICE_NAMES = {
 } as const satisfies Record<SocialService, string>;
 
 const { locale } = Astro.props;
-const configuredLinks: readonly SocialLink[] = SOCIAL_LINKS;
-const links = SOCIAL_SERVICE_ORDER.flatMap((service) =>
-  configuredLinks.filter((link) => link.service === service),
-);
+const links = getSocialLinks(locale);
 ---
 
 {

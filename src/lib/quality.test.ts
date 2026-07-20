@@ -124,3 +124,38 @@ test("builds programmatically focusable main-content targets", () => {
     true,
   );
 });
+
+test("builds one valid empty RSS feed for every locale", () => {
+  for (const locale of ["en", "zh", "fr"] as const) {
+    const feed = readBuiltPage(`${locale}/feed.xml`);
+
+    assert.match(feed, /<rss\b/u, locale);
+    assert.equal((feed.match(/<item\b/gu) ?? []).length, 0, locale);
+    assert.match(feed, new RegExp(`<language>${locale}</language>`, "u"), locale);
+  }
+});
+
+test("discovers the active locale RSS feed from metadata and social links", () => {
+  for (const locale of ["en", "zh", "fr"] as const) {
+    const home = readBuiltPage(`${locale}/index.html`);
+    const rssMetadata = getTags(home, "link").filter(
+      (link) =>
+        getAttribute(link, "rel") === "alternate" &&
+        getAttribute(link, "type") === "application/rss+xml",
+    );
+    const rssSocialLink = getTags(home, "a").find(
+      (anchor) => getAttribute(anchor, "data-social-service") === "rss",
+    );
+
+    assert.deepEqual(
+      rssMetadata.map((link) => getAttribute(link, "href")),
+      [`https://me.frankie.wang/${locale}/feed.xml`],
+      locale,
+    );
+    assert.equal(
+      getAttribute(rssSocialLink ?? "", "href"),
+      `/${locale}/feed.xml`,
+      locale,
+    );
+  }
+});

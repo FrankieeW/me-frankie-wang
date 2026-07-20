@@ -3,6 +3,7 @@ import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import { SITE } from "../data/site.ts";
 import {
+  getFeedPath,
   LOCALES,
   type Locale,
   type LocalizedRoute,
@@ -48,6 +49,7 @@ const {
   robots = "index, follow",
 } = Astro.props;
 const pageTitle = title === undefined ? SITE.name : `${title} — ${SITE.name}`;
+const feedUrl = getCanonicalUrl(getFeedPath(locale));
 const canonicalUrl =
   Astro.props.canonicalPath === undefined
     ? undefined
@@ -78,6 +80,12 @@ const openGraphLocales = {
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE.name + " — RSS"}
+      href={feedUrl}
+    />
     <title>{pageTitle}</title>
     {
       canonicalUrl !== undefined && (
