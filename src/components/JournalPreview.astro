@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import { getEntryPath, type Locale } from "../i18n/config.ts";
 import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import TopicLinks from "./TopicLinks.astro";
 
 type JournalPreviewVariant = "featured" | "row";
 
@@ -36,20 +37,24 @@ const href = getEntryPath(locale, "journal", entry.data.translationKey);
       {dateFormatter.format(entry.data.publishedAt)}
     </time>
   </a>
+  <TopicLinks locale={locale} topics={entry.data.topics} />
 </article>
 
 <style>
   .journal-preview,
   .journal-preview a {
     position: relative;
-    height: 100%;
   }
 
   .journal-preview {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     overflow: visible;
   }
 
   .journal-preview a {
+    flex: 1;
     padding: 26px;
     display: flex;
     flex-direction: column;

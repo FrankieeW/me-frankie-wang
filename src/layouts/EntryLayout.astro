@@ -9,6 +9,8 @@ import type {
   AlternatePathMap,
   LocalePathMap,
 } from "../lib/seo.ts";
+import type { TopicKey } from "../data/topics.ts";
+import TopicLinks from "../components/TopicLinks.astro";
 import SiteLayout from "./SiteLayout.astro";
 
 interface Props {
@@ -23,6 +25,7 @@ interface Props {
   readonly dateKind: "published" | "taken";
   readonly updatedAt: Date | undefined;
   readonly location: string | undefined;
+  readonly topics: readonly TopicKey[];
 }
 
 const {
@@ -37,6 +40,7 @@ const {
   dateKind,
   updatedAt,
   location,
+  topics,
 } = Astro.props;
 const copy = UI_TRANSLATIONS[locale];
 const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
@@ -85,6 +89,7 @@ const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
           )
         }
       </dl>
+      <TopicLinks locale={locale} topics={topics} />
     </header>
     <div class="entry-content">
       <slot />

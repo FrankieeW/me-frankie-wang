@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 import { z } from "astro/zod";
@@ -155,6 +155,35 @@ test("discovers the active locale RSS feed from metadata and social links", () =
     assert.equal(
       getAttribute(rssSocialLink ?? "", "href"),
       `/${locale}/feed.xml`,
+      locale,
+    );
+  }
+});
+
+test("does not generate empty topic routes or change primary navigation", () => {
+  for (const locale of ["en", "zh", "fr"] as const) {
+    assert.equal(
+      existsSync(new URL(`${locale}/topics/`, buildOutput)),
+      false,
+      locale,
+    );
+
+    const home = readBuiltPage(`${locale}/index.html`);
+    const primaryNavigation = getTags(home, "nav").find((navigation) =>
+      hasClass(navigation, "primary-navigation"),
+    );
+    const navigationMarkup = primaryNavigation ?? "";
+    const navigationStart = home.indexOf(navigationMarkup);
+    const navigationEnd = home.indexOf("</nav>", navigationStart);
+    const anchors = getTags(home.slice(navigationStart, navigationEnd), "a");
+
+    assert.deepEqual(
+      anchors.map((anchor) => getAttribute(anchor, "href")),
+      [
+        `/${locale}/journal/`,
+        `/${locale}/moments/`,
+        `/${locale}/hello/`,
+      ],
       locale,
     );
   }

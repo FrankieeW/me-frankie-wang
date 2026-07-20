@@ -64,6 +64,7 @@ const { Content } = await render(entry);
   dateKind="published"
   updatedAt={entry.data.updatedAt}
   location={undefined}
+  topics={entry.data.topics}
 >
   {
     entry.data.cover !== undefined && entry.data.coverAlt !== undefined && (

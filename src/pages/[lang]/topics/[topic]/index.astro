@@ -1,0 +1,151 @@
+---
+import {
+  getCollection,
+  type CollectionEntry,
+} from "astro:content";
+
+import JournalPreview from "../../../../components/JournalPreview.astro";
+import MomentPreview from "../../../../components/MomentPreview.astro";
+import { SITE_COPY } from "../../../../data/site.ts";
+import { TOPICS, type TopicKey } from "../../../../data/topics.ts";
+import {
+  getLocalizedPath,
+  getTopicPath,
+  type Locale,
+} from "../../../../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../../../../i18n/translations.ts";
+import SiteLayout from "../../../../layouts/SiteLayout.astro";
+import {
+  getTopicEntries,
+  getTopicRouteMatrix,
+} from "../../../../lib/content.ts";
+import type {
+  AlternatePathMap,
+  LocalePathMap,
+} from "../../../../lib/seo.ts";
+
+type TopicPageEntry =
+  | CollectionEntry<"journal">
+  | CollectionEntry<"moments">;
+
+interface Props {
+  readonly locale: Locale;
+  readonly topic: TopicKey;
+  readonly entries: readonly TopicPageEntry[];
+  readonly switchPaths: LocalePathMap;
+  readonly alternatePaths: AlternatePathMap;
+}
+
+export async function getStaticPaths() {
+  const [journalEntries, momentEntries] = await Promise.all([
+    getCollection("journal"),
+    getCollection("moments"),
+  ]);
+  const routeMatrix = getTopicRouteMatrix(journalEntries, momentEntries);
+
+  return routeMatrix.map(({ locale, topic }) => {
+    const entries: readonly TopicPageEntry[] = [
+      ...getTopicEntries(journalEntries, locale, topic),
+      ...getTopicEntries(momentEntries, locale, topic),
+    ].toSorted(
+      (left, right) =>
+        right.data.publishedAt.getTime() - left.data.publishedAt.getTime(),
+    );
+    const hasTopicRoute = (targetLocale: Locale) =>
+      routeMatrix.some(
+        (route) => route.locale === targetLocale && route.topic === topic,
+      );
+    const alternatePaths = {
+      en: hasTopicRoute("en") ? getTopicPath("en", topic) : undefined,
+      zh: hasTopicRoute("zh") ? getTopicPath("zh", topic) : undefined,
+      fr: hasTopicRoute("fr") ? getTopicPath("fr", topic) : undefined,
+    } satisfies AlternatePathMap;
+    const switchPaths = {
+      en: alternatePaths.en ?? getLocalizedPath("en", "home"),
+      zh: alternatePaths.zh ?? getLocalizedPath("zh", "home"),
+      fr: alternatePaths.fr ?? getLocalizedPath("fr", "home"),
+    } satisfies LocalePathMap;
+
+    return {
+      params: { lang: locale, topic },
+      props: {
+        locale,
+        topic,
+        entries,
+        switchPaths,
+        alternatePaths,
+      },
+    };
+  });
+}
+
+const {
+  locale,
+  topic,
+  entries,
+  switchPaths,
+  alternatePaths,
+} = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const label = TOPICS[topic].label[locale];
+---
+
+<SiteLayout
+  locale={locale}
+  currentLocale={locale}
+  route={undefined}
+  title={label}
+  description={SITE_COPY[locale].introduction}
+  canonicalPath={getTopicPath(locale, topic)}
+  switchPaths={switchPaths}
+  alternatePaths={alternatePaths}
+>
+  <div class="page-shell">
+    <header class="page-header topic-header">
+      <p>{copy.discovery.topic}</p>
+      <h1>{label}</h1>
+    </header>
+    <section class="content-section" aria-label={label}>
+      <div class="topic-index">
+        {
+          entries.map((entry) =>
+            entry.collection === "journal" ? (
+              <JournalPreview entry={entry} locale={locale} variant="row" />
+            ) : (
+              <MomentPreview entry={entry} locale={locale} variant="compact" />
+            ),
+          )
+        }
+      </div>
+    </section>
+  </div>
+</SiteLayout>
+
+<style>
+  .topic-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .topic-header p {
+    order: -1;
+    margin: 0;
+    color: var(--color-accent-ink);
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.16em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  :global([lang="zh"]) .topic-header p {
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .topic-index {
+    display: grid;
+    gap: var(--space-card-gap);
+  }
+</style>

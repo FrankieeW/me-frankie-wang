@@ -1,8 +1,14 @@
 import {
   getEntryPath,
+  getTopicPath,
   LOCALES,
   type Locale,
 } from "../i18n/config.ts";
+import {
+  TOPICS,
+  TOPIC_KEYS,
+  type TopicKey,
+} from "../data/topics.ts";
 
 type TranslatedEntry = {
   readonly id: string;
@@ -86,4 +92,58 @@ export function getLocaleFeedItems(
   return [...journalItems, ...momentItems].toSorted(
     (left, right) => right.pubDate.getTime() - left.pubDate.getTime(),
   );
+}
+
+type TopicAwareEntry = TranslatedEntry & {
+  readonly data: TranslatedEntry["data"] & {
+    readonly topics: readonly TopicKey[];
+  };
+};
+
+export type TopicRoute = {
+  readonly locale: Locale;
+  readonly topic: TopicKey;
+};
+
+export function getTopicEntries<T extends TopicAwareEntry>(
+  entries: readonly T[],
+  locale: Locale,
+  topic: TopicKey,
+): readonly T[] {
+  return getPublishedEntries(entries).filter(
+    (entry) =>
+      entry.data.locale === locale && entry.data.topics.includes(topic),
+  );
+}
+
+export function getTopicRouteMatrix(
+  journalEntries: readonly TopicAwareEntry[],
+  momentEntries: readonly TopicAwareEntry[],
+): readonly TopicRoute[] {
+  const entries = [...journalEntries, ...momentEntries];
+
+  return LOCALES.flatMap((locale) =>
+    TOPIC_KEYS.flatMap((topic) =>
+      getTopicEntries(entries, locale, topic).length === 0
+        ? []
+        : [{ locale, topic }],
+    ),
+  );
+}
+
+export type TopicLink = {
+  readonly topic: TopicKey;
+  readonly label: string;
+  readonly href: string;
+};
+
+export function getTopicLinks(
+  locale: Locale,
+  topics: readonly TopicKey[],
+): readonly TopicLink[] {
+  return topics.map((topic) => ({
+    topic,
+    label: TOPICS[topic].label[locale],
+    href: getTopicPath(locale, topic),
+  }));
 }
