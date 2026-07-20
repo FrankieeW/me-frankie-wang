@@ -1,5 +1,13 @@
 ---
+import FriendsList from "../../../components/FriendsList.astro";
+import PlaceIndex from "../../../components/PlaceIndex.astro";
+import SiteHistory from "../../../components/SiteHistory.astro";
 import SocialLinks from "../../../components/SocialLinks.astro";
+import {
+  FRIENDS,
+  PLACES,
+  SITE_HISTORY,
+} from "../../../data/personal.ts";
 import { SITE_COPY } from "../../../data/site.ts";
 import { LOCALES, type Locale } from "../../../i18n/config.ts";
 import { UI_TRANSLATIONS } from "../../../i18n/translations.ts";
@@ -39,5 +47,10 @@ const paths = getCoreLocalePaths("hello");
       <p>{siteCopy.introduction}</p>
       <SocialLinks locale={locale} />
     </header>
+    <div class="hello-sections">
+      <PlaceIndex locale={locale} places={PLACES} />
+      <FriendsList locale={locale} friends={FRIENDS} />
+      <SiteHistory locale={locale} records={SITE_HISTORY} />
+    </div>
   </div>
 </SiteLayout>

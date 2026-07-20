@@ -1,4 +1,5 @@
 ---
+import { SITE_START_YEAR } from "../data/personal.ts";
 import { getLocalizedPath, type Locale } from "../i18n/config.ts";
 import { UI_TRANSLATIONS } from "../i18n/translations.ts";
 
@@ -7,6 +8,10 @@ interface Props {
 }
 
 const { locale } = Astro.props;
+const since = UI_TRANSLATIONS[locale].discovery.since.replace(
+  "{year}",
+  String(SITE_START_YEAR),
+);
 ---
 
 <footer class="site-footer">
@@ -17,6 +22,7 @@ const { locale } = Astro.props;
     <a href={getLocalizedPath(locale, "hello")}>
       {UI_TRANSLATIONS[locale].navigation.hello}
     </a>
+    <span class="site-footer__since">{since}</span>
     <span class="site-footer__locales" aria-label="English, 中文, Français">
       EN / 中 / FR
     </span>

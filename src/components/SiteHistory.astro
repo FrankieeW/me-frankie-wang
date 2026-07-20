@@ -1,0 +1,63 @@
+---
+import type { SiteHistoryRecord } from "../data/personal.ts";
+import type { Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+interface Props {
+  readonly locale: Locale;
+  readonly records: readonly SiteHistoryRecord[];
+}
+
+const { locale, records } = Astro.props;
+---
+
+<section class="hello-section site-history" aria-labelledby="history-heading">
+  <h2 id="history-heading">{UI_TRANSLATIONS[locale].discovery.history}</h2>
+  <ol>
+    {
+      records.map((record) => (
+        <li>
+          <time datetime={String(record.year)}>{record.year}</time>
+          <p>{record.description[locale]}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-ink);
+  }
+
+  li {
+    padding-block: var(--space-4);
+    display: grid;
+    grid-template-columns: var(--space-16) minmax(0, 1fr);
+    gap: var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  time {
+    color: var(--color-accent-ink);
+    font-size: 12px;
+    font-weight: 760;
+    font-variant-numeric: tabular-nums;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-body);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 680px) {
+    li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+  }
+</style>

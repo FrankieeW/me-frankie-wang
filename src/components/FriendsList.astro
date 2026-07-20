@@ -1,0 +1,85 @@
+---
+import { Image } from "astro:assets";
+
+import type { Friend } from "../data/personal.ts";
+import type { Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+interface Props {
+  readonly locale: Locale;
+  readonly friends: readonly Friend[];
+}
+
+const { locale, friends } = Astro.props;
+const copy = UI_TRANSLATIONS[locale].discovery;
+---
+
+{
+  friends.length > 0 && (
+    <section class="hello-section friends-list" aria-labelledby="friends-heading">
+      <h2 id="friends-heading">{copy.friends}</h2>
+      <ul>
+        {friends.map((friend) => (
+          <li>
+            {friend.avatar !== undefined && friend.avatarAlt !== undefined && (
+              <Image
+                src={friend.avatar}
+                alt={friend.avatarAlt[locale]}
+                width={48}
+                height={48}
+              />
+            )}
+            <div>
+              <a href={friend.url} rel="friend">{friend.name}</a>
+              <p>{friend.description[locale]}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  ul {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-5);
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  :global(img) {
+    flex: 0 0 var(--space-12);
+    width: var(--space-12);
+    height: var(--space-12);
+    border: 1px solid var(--color-line);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  a {
+    color: var(--color-ink);
+    font-weight: 720;
+    text-underline-offset: var(--space-1);
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--color-accent-ink);
+  }
+
+  p {
+    max-width: 58ch;
+    margin: var(--space-1) 0 0;
+    color: var(--color-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+</style>

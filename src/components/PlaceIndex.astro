@@ -1,0 +1,117 @@
+---
+import type { Place } from "../data/personal.ts";
+import type { Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+
+interface Props {
+  readonly locale: Locale;
+  readonly places: readonly Place[];
+}
+
+const { locale, places } = Astro.props;
+const copy = UI_TRANSLATIONS[locale].discovery;
+const showPlot =
+  places.length > 0 &&
+  places.every((place) => place.x !== undefined && place.y !== undefined);
+---
+
+{
+  places.length > 0 && (
+    <section class="hello-section place-index" aria-labelledby="places-heading">
+      <h2 id="places-heading">{copy.places}</h2>
+      <ul class="place-index__list">
+        {places.map((place) => (
+          <li>
+            <span>
+              {place.city[locale]}, {place.country[locale]}
+            </span>
+            <span>{place.kind === "lived" ? copy.lived : copy.visited}</span>
+          </li>
+        ))}
+      </ul>
+      {showPlot && (
+        <div class="place-index__plot" aria-hidden="true">
+          {places.map((place) => (
+            <span
+              class="place-index__point"
+              style={`--place-x: ${place.x}%; --place-y: ${place.y}%;`}
+            >
+              <span>{place.city[locale]}</span>
+            </span>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+<style>
+  .place-index__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-ink);
+  }
+
+  .place-index__list li {
+    padding-block: var(--space-4);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .place-index__list span:first-child {
+    color: var(--color-ink);
+    font-weight: 650;
+  }
+
+  .place-index__list span:last-child {
+    color: var(--color-muted);
+    font-size: 12px;
+  }
+
+  .place-index__plot {
+    position: relative;
+    min-height: calc(var(--space-20) * 3);
+    margin-top: var(--space-8);
+    overflow: hidden;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 18px;
+    background-image:
+      linear-gradient(var(--color-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+    background-size: var(--space-10) var(--space-10);
+  }
+
+  .place-index__point {
+    position: absolute;
+    top: var(--place-y);
+    left: var(--place-x);
+    width: var(--space-3);
+    height: var(--space-3);
+    border: 1px solid var(--color-ink);
+    border-radius: 50%;
+    background: var(--color-accent);
+    transform: translate(-50%, -50%);
+  }
+
+  .place-index__point span {
+    position: absolute;
+    top: var(--space-4);
+    left: 50%;
+    width: max-content;
+    max-width: calc(var(--space-20) * 2);
+    color: var(--color-ink);
+    font-size: 11px;
+    font-weight: 650;
+    transform: translateX(-50%);
+  }
+
+  @media (max-width: 680px) {
+    .place-index__list li {
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+  }
+</style>

@@ -111,7 +111,7 @@ export const UI_TRANSLATIONS = {
       friends: "Friends",
       history: "Site history",
       transcript: "Read transcript",
-      since: "Since 2026",
+      since: "Since {year}",
     },
   },
   zh: {
@@ -168,7 +168,7 @@ export const UI_TRANSLATIONS = {
       friends: "朋友们",
       history: "网站沿革",
       transcript: "阅读文字稿",
-      since: "始于 2026",
+      since: "始于 {year}",
     },
   },
   fr: {
@@ -226,7 +226,7 @@ export const UI_TRANSLATIONS = {
       friends: "Amis",
       history: "Histoire du site",
       transcript: "Lire la transcription",
-      since: "Depuis 2026",
+      since: "Depuis {year}",
     },
   },
 } as const satisfies Record<Locale, UiTranslations>;

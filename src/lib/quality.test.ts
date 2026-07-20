@@ -188,3 +188,30 @@ test("does not generate empty topic routes or change primary navigation", () => 
     );
   }
 });
+
+test("publishes site history while omitting empty personal sections", () => {
+  const expectedHistory = {
+    en: "me.frankie.wang launched as an independent static Astro site.",
+    zh: "me.frankie.wang 于 2026 年作为独立的 Astro 静态网站上线。",
+    fr: "me.frankie.wang a été lancé comme site Astro statique indépendant.",
+  } as const;
+  const expectedSince = {
+    en: "Since 2026",
+    zh: "始于 2026",
+    fr: "Depuis 2026",
+  } as const;
+
+  for (const locale of ["en", "zh", "fr"] as const) {
+    const hello = readBuiltPage(`${locale}/hello/index.html`);
+
+    assert.equal(hello.includes("class=\"place-index\""), false, locale);
+    assert.equal(hello.includes("class=\"friends-list\""), false, locale);
+    assert.equal(hello.includes(expectedHistory[locale]), true, locale);
+    assert.equal(hello.includes(expectedSince[locale]), true, locale);
+    assert.doesNotMatch(
+      hello,
+      /latitude|longitude|geolocation|current-location/iu,
+      locale,
+    );
+  }
+});
