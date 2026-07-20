@@ -3,20 +3,15 @@ import { getCoreLocalePaths } from "../lib/seo.ts";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const homePaths = getCoreLocalePaths("home");
-const noAlternatePaths = {
-  en: undefined,
-  zh: undefined,
-  fr: undefined,
-};
 ---
 
 <SiteLayout
   locale="en"
+  currentLocale={undefined}
+  route={undefined}
   title="Page not found"
   description="This address does not lead to a published page."
-  canonicalPath="/404/"
   switchPaths={homePaths}
-  alternatePaths={noAlternatePaths}
   robots="noindex, follow"
 >
   <div class="page-shell not-found">
@@ -71,9 +66,7 @@ const noAlternatePaths = {
     font-size: 14px;
     font-weight: 760;
     text-decoration: none;
-    transition:
-      transform var(--motion-micro),
-      box-shadow var(--motion-micro);
+    transition: transform var(--motion-micro);
   }
 
   .not-found__home:hover {

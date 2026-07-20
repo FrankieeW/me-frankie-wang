@@ -4,6 +4,29 @@ import test from "node:test";
 
 import { z } from "astro/zod";
 
+const buildOutput = new URL("../../dist/", import.meta.url);
+
+function readBuiltPage(relativePath: string): string {
+  return readFileSync(new URL(relativePath, buildOutput), "utf8");
+}
+
+function getTags(html: string, tagName: string): readonly string[] {
+  return [...html.matchAll(new RegExp(`<${tagName}\\b[^>]*>`, "g"))].map(
+    (match) => match[0],
+  );
+}
+
+function getAttribute(tag: string, name: string): string | undefined {
+  const match = tag.match(
+    new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`),
+  );
+  return match?.[1] ?? match?.[2];
+}
+
+function hasClass(tag: string, className: string): boolean {
+  return getAttribute(tag, "class")?.split(/\\s+/).includes(className) ?? false;
+}
+
 test("configures a temporary HTTP redirect from the site root", () => {
   // Given
   const redirectSchema = z.object({
@@ -34,22 +57,70 @@ test("configures a temporary HTTP redirect from the site root", () => {
   );
 });
 
-test("provides a branded noindex page for unknown routes", () => {
-  const source = readFileSync(
-    new URL("../pages/404.astro", import.meta.url),
-    "utf8",
+test("builds a noindex recovery page without canonical metadata", () => {
+  const notFound = readBuiltPage("404.html");
+  const links = getTags(notFound, "link");
+  const metas = getTags(notFound, "meta");
+  const anchors = getTags(notFound, "a");
+
+  assert.equal(
+    links.find((link) => getAttribute(link, "rel") === "canonical"),
+    undefined,
+  );
+  assert.equal(
+    metas.find((meta) => getAttribute(meta, "property") === "og:url"),
+    undefined,
+  );
+  assert.equal(
+    links.filter((link) => getAttribute(link, "hreflang") !== undefined).length,
+    0,
+  );
+  assert.equal(
+    metas.find(
+      (meta) =>
+        getAttribute(meta, "name") === "robots" &&
+        getAttribute(meta, "content") === "noindex, follow",
+    ) !== undefined,
+    true,
   );
 
-  assert.match(source, /<SiteLayout/);
-  assert.match(source, /robots="noindex, follow"/);
-  assert.match(source, /href="\/en\/"/);
+  const languageLinks = anchors.filter((anchor) =>
+    hasClass(anchor, "language-switcher__link"),
+  );
+  assert.deepEqual(
+    languageLinks.map((anchor) => getAttribute(anchor, "href")),
+    ["/en/", "/zh/", "/fr/"],
+  );
+  assert.equal(
+    languageLinks.every(
+      (anchor) => getAttribute(anchor, "aria-current") === undefined,
+    ),
+    true,
+  );
+
+  const homeLink = anchors.find((anchor) => hasClass(anchor, "not-found__home"));
+  assert.equal(getAttribute(homeLink ?? "", "href"), "/en/");
 });
 
-test("moves skip-link focus to the main content target", () => {
-  const source = readFileSync(
-    new URL("../layouts/SiteLayout.astro", import.meta.url),
-    "utf8",
-  );
+test("builds programmatically focusable main-content targets", () => {
+  for (const relativePath of ["en/index.html", "404.html"]) {
+    const main = getTags(readBuiltPage(relativePath), "main").find(
+      (tag) => getAttribute(tag, "id") === "main-content",
+    );
+    assert.equal(getAttribute(main ?? "", "tabindex"), "-1", relativePath);
+  }
 
-  assert.match(source, /<main id="main-content" tabindex="-1">/);
+  const home = readBuiltPage("en/index.html");
+  assert.equal(
+    getTags(home, "link").some(
+      (link) => getAttribute(link, "rel") === "canonical",
+    ),
+    true,
+  );
+  assert.equal(
+    getTags(home, "meta").some(
+      (meta) => getAttribute(meta, "property") === "og:url",
+    ),
+    true,
+  );
 });

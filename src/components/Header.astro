@@ -10,11 +10,12 @@ import LanguageSwitcher from "./LanguageSwitcher.astro";
 
 interface Props {
   readonly locale: Locale;
+  readonly currentLocale: Locale | undefined;
   readonly route: LocalizedRoute | undefined;
   readonly switchPaths: LocalePathMap;
 }
 
-const { locale, route, switchPaths } = Astro.props;
+const { locale, currentLocale, route, switchPaths } = Astro.props;
 const copy = UI_TRANSLATIONS[locale];
 const navigationRoutes = ["journal", "moments", "hello"] as const;
 const mobileNavigationId = `mobile-navigation-${locale}`;
@@ -48,7 +49,11 @@ const mobileNavigationId = `mobile-navigation-${locale}`;
       }
     </nav>
 
-    <LanguageSwitcher locale={locale} paths={switchPaths} />
+    <LanguageSwitcher
+      locale={locale}
+      currentLocale={currentLocale}
+      paths={switchPaths}
+    />
 
     <button
       class="mobile-navigation-toggle"

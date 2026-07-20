@@ -34,6 +34,7 @@ const entries = getPublishedEntries(await getCollection("journal")).filter(
 
 <SiteLayout
   locale={locale}
+  currentLocale={locale}
   route="journal"
   title={copy.navigation.journal}
   description={SITE_COPY[locale].introduction}

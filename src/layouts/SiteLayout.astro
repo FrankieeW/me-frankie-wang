@@ -15,36 +15,53 @@ import {
 } from "../lib/seo.ts";
 import "../styles/global.css";
 
-interface Props {
+interface CommonProps {
   readonly locale: Locale;
-  readonly route?: LocalizedRoute;
+  readonly currentLocale: Locale | undefined;
+  readonly route: LocalizedRoute | undefined;
   readonly title?: string;
   readonly description: string;
-  readonly canonicalPath: string;
   readonly switchPaths: LocalePathMap;
-  readonly alternatePaths: AlternatePathMap;
-  readonly robots?: "index, follow" | "noindex, follow";
 }
+
+interface CanonicalMetadataProps {
+  readonly canonicalPath: string;
+  readonly alternatePaths: AlternatePathMap;
+  readonly robots?: "index, follow";
+}
+
+interface NoIndexMetadataProps {
+  readonly canonicalPath?: never;
+  readonly alternatePaths?: never;
+  readonly robots: "noindex, follow";
+}
+
+type Props = CommonProps & (CanonicalMetadataProps | NoIndexMetadataProps);
 
 const {
   locale,
+  currentLocale,
   route,
   title,
   description,
-  canonicalPath,
   switchPaths,
-  alternatePaths,
   robots = "index, follow",
 } = Astro.props;
 const pageTitle = title === undefined ? SITE.name : `${title} — ${SITE.name}`;
-const canonicalUrl = getCanonicalUrl(canonicalPath);
-const alternateLinks = LOCALES.flatMap((alternateLocale) => {
-  const path = alternatePaths[alternateLocale];
-  return path === undefined
+const canonicalUrl =
+  Astro.props.canonicalPath === undefined
+    ? undefined
+    : getCanonicalUrl(Astro.props.canonicalPath);
+const alternateLinks =
+  Astro.props.alternatePaths === undefined
     ? []
-    : [{ locale: alternateLocale, href: getCanonicalUrl(path) }];
-});
-const defaultPath = alternatePaths.en;
+    : LOCALES.flatMap((alternateLocale) => {
+        const path = Astro.props.alternatePaths?.[alternateLocale];
+        return path === undefined
+          ? []
+          : [{ locale: alternateLocale, href: getCanonicalUrl(path) }];
+      });
+const defaultPath = Astro.props.alternatePaths?.en;
 const openGraphLocales = {
   en: "en_GB",
   zh: "zh_CN",
@@ -62,7 +79,11 @@ const openGraphLocales = {
     <meta name="robots" content={robots} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{pageTitle}</title>
-    <link rel="canonical" href={canonicalUrl} />
+    {
+      canonicalUrl !== undefined && (
+        <link rel="canonical" href={canonicalUrl} />
+      )
+    }
     {
       alternateLinks.map((link) => (
         <link rel="alternate" hreflang={link.locale} href={link.href} />
@@ -81,7 +102,11 @@ const openGraphLocales = {
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalUrl} />
+    {
+      canonicalUrl !== undefined && (
+        <meta property="og:url" content={canonicalUrl} />
+      )
+    }
     <meta property="og:locale" content={openGraphLocales[locale]} />
     {
       alternateLinks
@@ -99,7 +124,12 @@ const openGraphLocales = {
     <a class="skip-link" href="#main-content">
       {UI_TRANSLATIONS[locale].accessibility.skipToContent}
     </a>
-    <Header locale={locale} route={route} switchPaths={switchPaths} />
+    <Header
+      locale={locale}
+      currentLocale={currentLocale}
+      route={route}
+      switchPaths={switchPaths}
+    />
     <main id="main-content" tabindex="-1">
       <slot />
     </main>

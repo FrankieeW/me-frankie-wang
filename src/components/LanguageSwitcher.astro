@@ -10,10 +10,11 @@ import type { LocalePathMap } from "../lib/seo.ts";
 
 interface Props {
   readonly locale: Locale;
+  readonly currentLocale: Locale | undefined;
   readonly paths: LocalePathMap;
 }
 
-const { locale, paths } = Astro.props;
+const { locale, currentLocale, paths } = Astro.props;
 ---
 
 <nav
@@ -32,7 +33,7 @@ const { locale, paths } = Astro.props;
           hreflang={targetLocale}
           lang={targetLocale}
           aria-label={LOCALE_NAMES[targetLocale]}
-          aria-current={targetLocale === locale ? "page" : undefined}
+          aria-current={targetLocale === currentLocale ? "page" : undefined}
         >
           {LOCALE_LABELS[targetLocale]}
         </a>

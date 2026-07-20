@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "test": "node --experimental-strip-types --test src/lib/*.test.ts",
+    "test": "npm run build && node --experimental-strip-types --test src/lib/*.test.ts",
     "check": "astro check",
     "build": "astro build",
     "preview": "astro preview"
