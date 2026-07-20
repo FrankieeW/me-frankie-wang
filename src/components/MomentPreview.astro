@@ -26,7 +26,10 @@ const sizes =
     : "(max-width: 680px) calc(100vw - 44px), (max-width: 1024px) 36vw, 360px";
 ---
 
-<article class:list={["moment-preview", `moment-preview--${variant}`]}>
+<article
+  class:list={["moment-preview", `moment-preview--${variant}`]}
+  data-search-entry={entry.id}
+>
   <a href={href} aria-label={entry.data.caption}>
     {
       image !== undefined && (

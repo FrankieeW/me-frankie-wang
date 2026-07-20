@@ -215,3 +215,14 @@ test("publishes site history while omitting empty personal sections", () => {
     );
   }
 });
+
+test("omits content search before a locale has ten public entries", () => {
+  for (const locale of ["en", "zh", "fr"] as const) {
+    for (const section of ["journal", "moments"] as const) {
+      const page = readBuiltPage(`${locale}/${section}/index.html`);
+
+      assert.equal(page.includes("data-content-search"), false, `${locale}/${section}`);
+      assert.equal(page.includes("data-search-input"), false, `${locale}/${section}`);
+    }
+  }
+});

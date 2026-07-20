@@ -147,3 +147,13 @@ export function getTopicLinks(
     href: getTopicPath(locale, topic),
   }));
 }
+
+export {
+  createJournalSearchDocuments,
+  createMomentSearchDocuments,
+  matchesSearchQuery,
+  normalizeSearchText,
+  SEARCH_ENTRY_THRESHOLD,
+  shouldEnableSearch,
+} from "./search.ts";
+export type { SearchDocument } from "./search.ts";

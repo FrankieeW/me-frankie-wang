@@ -19,7 +19,10 @@ const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 const href = getEntryPath(locale, "journal", entry.data.translationKey);
 ---
 
-<article class:list={["journal-preview", `journal-preview--${variant}`]}>
+<article
+  class:list={["journal-preview", `journal-preview--${variant}`]}
+  data-search-entry={entry.id}
+>
   <a href={href} aria-label={entry.data.title}>
     <div class="journal-preview__kicker">
       <span>{copy.navigation.journal}</span>

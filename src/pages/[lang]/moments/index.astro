@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 
+import ContentSearch from "../../../components/ContentSearch.astro";
 import EmptyState from "../../../components/EmptyState.astro";
 import MomentPreview from "../../../components/MomentPreview.astro";
 import { SITE_COPY } from "../../../data/site.ts";
@@ -10,7 +11,10 @@ import {
 } from "../../../i18n/config.ts";
 import { UI_TRANSLATIONS } from "../../../i18n/translations.ts";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
-import { getPublishedEntries } from "../../../lib/content.ts";
+import {
+  createMomentSearchDocuments,
+  getPublishedEntries,
+} from "../../../lib/content.ts";
 import { getCoreLocalePaths } from "../../../lib/seo.ts";
 
 interface Props {
@@ -27,9 +31,11 @@ export function getStaticPaths() {
 const { locale } = Astro.props;
 const copy = UI_TRANSLATIONS[locale];
 const paths = getCoreLocalePaths("moments");
-const entries = getPublishedEntries(await getCollection("moments")).filter(
+const allEntries = await getCollection("moments");
+const entries = getPublishedEntries(allEntries).filter(
   (entry) => entry.data.locale === locale,
 );
+const searchDocuments = createMomentSearchDocuments(allEntries, locale);
 ---
 
 <SiteLayout
@@ -47,6 +53,11 @@ const entries = getPublishedEntries(await getCollection("moments")).filter(
       <h1>{copy.navigation.moments}</h1>
     </header>
     <section class="content-section" aria-label={copy.navigation.moments}>
+      <ContentSearch
+        locale={locale}
+        section="moments"
+        documents={searchDocuments}
+      />
       {
         entries.length === 0 ? (
           <EmptyState message={copy.emptyState.moments} />

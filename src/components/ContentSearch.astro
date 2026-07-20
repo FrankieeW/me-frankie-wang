@@ -1,0 +1,215 @@
+---
+import type { EntryRoute, Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import {
+  shouldEnableSearch,
+  type SearchDocument,
+} from "../lib/content.ts";
+
+interface Props {
+  readonly locale: Locale;
+  readonly section: EntryRoute;
+  readonly documents: readonly SearchDocument[];
+}
+
+const { locale, section, documents } = Astro.props;
+const copy = UI_TRANSLATIONS[locale];
+const enabled = shouldEnableSearch(documents);
+const searchLabel =
+  section === "journal"
+    ? copy.discovery.searchJournal
+    : copy.discovery.searchMoments;
+const inputId = `${section}-search-${locale}`;
+const statusId = `${inputId}-status`;
+const emptyId = `${inputId}-empty`;
+const searchIndex = documents.map(({ id, searchText }) => ({ id, searchText }));
+const serializedIndex = JSON.stringify(searchIndex).replaceAll("<", "\\u003c");
+---
+
+{
+  enabled && (
+    <section
+      class="content-search"
+      role="search"
+      aria-label={searchLabel}
+      data-content-search
+      data-results-template={copy.discovery.searchResults}
+    >
+      <label for={inputId}>{searchLabel}</label>
+      <input
+        id={inputId}
+        type="search"
+        placeholder={copy.discovery.searchPlaceholder}
+        aria-describedby={`${statusId} ${emptyId}`}
+        data-search-input
+      />
+      <output id={statusId} for={inputId} aria-live="polite" data-search-status>
+        {copy.discovery.searchResults.replace("{count}", String(documents.length))}
+      </output>
+      <p id={emptyId} hidden data-search-empty>{copy.discovery.searchNoResults}</p>
+      <script
+        type="application/json"
+        is:inline
+        data-search-index
+        set:html={serializedIndex}
+      ></script>
+      <script is:inline>
+        function isSearchIndexItem(value) {
+          return (
+            typeof value === "object" &&
+            value !== null &&
+            "id" in value &&
+            typeof value.id === "string" &&
+            "searchText" in value &&
+            typeof value.searchText === "string"
+          );
+        }
+
+        function getSearchIndex(payload) {
+          if (payload === null) {
+            return undefined;
+          }
+
+          try {
+            const parsed = JSON.parse(payload);
+
+            if (!Array.isArray(parsed)) {
+              return undefined;
+            }
+
+            const documents = [];
+            for (const value of parsed) {
+              if (isSearchIndexItem(value)) {
+                documents.push(value);
+              }
+            }
+
+            return documents;
+          } catch (error) {
+            if (error instanceof SyntaxError) {
+              return undefined;
+            }
+
+            throw error;
+          }
+        }
+
+        function getQueryTerms(query) {
+          return query
+            .normalize("NFD")
+            .replace(/\p{Diacritic}/gu, "")
+            .toLocaleLowerCase()
+            .trim()
+            .split(/\s+/u)
+            .filter((term) => term.length > 0);
+        }
+
+        const root = document.currentScript?.closest("[data-content-search]");
+        const input = root?.querySelector("[data-search-input]");
+        const status = root?.querySelector("[data-search-status]");
+        const empty = root?.querySelector("[data-search-empty]");
+        const index = getSearchIndex(
+          root?.querySelector("[data-search-index]")?.textContent ?? null,
+        );
+
+        if (root && input && status && empty && index) {
+          const entriesById = new Map();
+          const indexEntries = () => {
+            for (const entry of document.querySelectorAll("[data-search-entry]")) {
+              const id = entry.dataset.searchEntry;
+              if (id !== undefined) {
+                entriesById.set(id, entry);
+              }
+            }
+          };
+
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", indexEntries, { once: true });
+          } else {
+            indexEntries();
+          }
+
+          const resultsTemplate = root.dataset.resultsTemplate ?? "Results: {count}";
+          let compositionActive = false;
+          let lastQuery = input.value;
+
+          const updateResults = () => {
+            const query = input.value;
+            if (query === lastQuery) {
+              return;
+            }
+
+            lastQuery = query;
+            const terms = getQueryTerms(query);
+            const results = index.filter((document) =>
+              terms.every((term) => document.searchText.includes(term)),
+            );
+            const resultIds = new Set(results.map((document) => document.id));
+
+            for (const document of index) {
+              const entry = entriesById.get(document.id);
+              if (entry !== undefined) {
+                entry.hidden = !resultIds.has(document.id);
+              }
+            }
+
+            status.textContent = resultsTemplate.replace("{count}", String(results.length));
+            empty.hidden = terms.length === 0 || results.length > 0;
+          };
+
+          input.addEventListener("compositionstart", () => {
+            compositionActive = true;
+          });
+          input.addEventListener("compositionend", () => {
+            compositionActive = false;
+            updateResults();
+          });
+          input.addEventListener("input", (event) => {
+            if (!compositionActive && !event.isComposing) {
+              updateResults();
+            }
+          });
+        }
+      </script>
+    </section>
+  )
+}
+
+<style>
+  .content-search {
+    margin-bottom: var(--space-8);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  label {
+    color: var(--color-ink);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  input {
+    min-height: var(--control-min-size);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-line-strong);
+    border-radius: 12px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  input::placeholder {
+    color: var(--color-quiet);
+  }
+
+  output,
+  p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  p {
+    color: var(--color-accent-ink);
+  }
+</style>
