@@ -1,0 +1,115 @@
+---
+import type { Locale } from "../i18n/config.ts";
+import { UI_TRANSLATIONS } from "../i18n/translations.ts";
+import type { TableOfContentsHeading } from "../lib/toc.ts";
+
+interface Props {
+  readonly locale: Locale;
+  readonly headings: readonly TableOfContentsHeading[];
+}
+
+const { locale, headings } = Astro.props;
+const copy = UI_TRANSLATIONS[locale].discovery;
+---
+
+<nav class="table-of-contents table-of-contents--desktop" aria-label={copy.tableOfContents}>
+  <p>{copy.tableOfContents}</p>
+  <ol>
+    {
+      headings.map((heading) => (
+        <li class:list={{ "table-of-contents__item--nested": heading.depth === 3 }}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<details class="table-of-contents table-of-contents--mobile">
+  <summary>{copy.tableOfContentsSummary}</summary>
+  <nav aria-label={copy.tableOfContents}>
+    <ol>
+      {
+        headings.map((heading) => (
+          <li class:list={{ "table-of-contents__item--nested": heading.depth === 3 }}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+</details>
+
+<style>
+  .table-of-contents {
+    color: var(--color-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .table-of-contents--desktop {
+    display: none;
+  }
+
+  p {
+    margin: 0 0 var(--space-3);
+    color: var(--color-ink);
+    font-size: 11px;
+    font-weight: 760;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+    list-style: none;
+  }
+
+  .table-of-contents__item--nested {
+    padding-left: var(--space-3);
+  }
+
+  a {
+    color: inherit;
+    overflow-wrap: anywhere;
+    text-decoration-line: underline;
+    text-decoration-color: var(--color-line-strong);
+    text-underline-offset: var(--space-1);
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--color-accent-ink);
+    text-decoration-color: currentColor;
+  }
+
+  summary {
+    min-height: var(--control-min-size);
+    padding-inline: var(--space-3);
+    display: flex;
+    align-items: center;
+    border-block: 1px solid var(--color-line);
+    color: var(--color-ink);
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  details nav {
+    padding: var(--space-4) var(--space-3) 0;
+  }
+
+  @media (min-width: 821px) {
+    .table-of-contents--desktop {
+      position: sticky;
+      top: calc(var(--space-20) + var(--space-6));
+      display: block;
+    }
+
+    .table-of-contents--mobile {
+      display: none;
+    }
+  }
+</style>

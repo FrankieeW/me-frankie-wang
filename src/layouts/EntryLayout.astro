@@ -44,6 +44,8 @@ const {
 } = Astro.props;
 const copy = UI_TRANSLATIONS[locale];
 const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
+const hasCover = Astro.slots.has("cover");
+const hasTableOfContents = Astro.slots.has("toc");
 ---
 
 <SiteLayout
@@ -89,10 +91,37 @@ const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
           )
         }
       </dl>
-      <TopicLinks locale={locale} topics={topics} />
     </header>
-    <div class="entry-content">
-      <slot />
+    {
+      hasCover && (
+        <div class="entry-cover">
+          <slot name="cover" />
+        </div>
+      )
+    }
+    {
+      topics.length > 0 && (
+        <div class="entry-topics">
+          <TopicLinks locale={locale} topics={topics} />
+        </div>
+      )
+    }
+    <div
+      class:list={[
+        "entry-body",
+        { "entry-body--with-toc": hasTableOfContents },
+      ]}
+    >
+      {
+        hasTableOfContents && (
+          <aside class="entry-toc">
+            <slot name="toc" />
+          </aside>
+        )
+      }
+      <div class="entry-content">
+        <slot />
+      </div>
     </div>
   </article>
 </SiteLayout>

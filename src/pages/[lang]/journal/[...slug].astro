@@ -13,6 +13,11 @@ import {
   getPublishedEntries,
 } from "../../../lib/content.ts";
 import { getEntryLocalePaths } from "../../../lib/seo.ts";
+import TableOfContents from "../../../components/TableOfContents.astro";
+import {
+  getTableOfContentsHeadings,
+  shouldShowTableOfContents,
+} from "../../../lib/toc.ts";
 
 interface Props {
   readonly entry: CollectionEntry<"journal">;
@@ -49,7 +54,9 @@ const canonicalPath = getEntryPath(
   "journal",
   entry.data.translationKey,
 );
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+const tableOfContentsHeadings = getTableOfContentsHeadings(headings);
+const showTableOfContents = shouldShowTableOfContents(headings);
 ---
 
 <EntryLayout
@@ -67,8 +74,17 @@ const { Content } = await render(entry);
   topics={entry.data.topics}
 >
   {
+    showTableOfContents && (
+      <TableOfContents
+        slot="toc"
+        locale={locale}
+        headings={tableOfContentsHeadings}
+      />
+    )
+  }
+  {
     entry.data.cover !== undefined && entry.data.coverAlt !== undefined && (
-      <figure class="entry-media">
+      <figure slot="cover" class="entry-media">
         <Image src={entry.data.cover} alt={entry.data.coverAlt} />
       </figure>
     )
