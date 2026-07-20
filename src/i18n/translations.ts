@@ -35,6 +35,24 @@ type UiTranslations = {
     readonly moments: string;
     readonly timeline: string;
   };
+  readonly discovery: {
+    readonly topics: string;
+    readonly topic: string;
+    readonly searchJournal: string;
+    readonly searchMoments: string;
+    readonly searchPlaceholder: string;
+    readonly searchResults: string;
+    readonly searchNoResults: string;
+    readonly tableOfContents: string;
+    readonly tableOfContentsSummary: string;
+    readonly places: string;
+    readonly lived: string;
+    readonly visited: string;
+    readonly friends: string;
+    readonly history: string;
+    readonly transcript: string;
+    readonly since: string;
+  };
 };
 
 export const UI_TRANSLATIONS = {
@@ -77,6 +95,24 @@ export const UI_TRANSLATIONS = {
       moments: "No public moments yet.",
       timeline: "No public entries yet.",
     },
+    discovery: {
+      topics: "Topics",
+      topic: "Topic",
+      searchJournal: "Search Journal",
+      searchMoments: "Search Moments",
+      searchPlaceholder: "Search public entries",
+      searchResults: "Results: {count}",
+      searchNoResults: "No matching entries.",
+      tableOfContents: "On this page",
+      tableOfContentsSummary: "Show contents",
+      places: "Places",
+      lived: "Lived",
+      visited: "Visited",
+      friends: "Friends",
+      history: "Site history",
+      transcript: "Read transcript",
+      since: "Since 2026",
+    },
   },
   zh: {
     navigation: {
@@ -115,6 +151,24 @@ export const UI_TRANSLATIONS = {
       journal: "还没有公开的随笔。",
       moments: "还没有公开的片刻。",
       timeline: "还没有公开内容。",
+    },
+    discovery: {
+      topics: "主题",
+      topic: "主题",
+      searchJournal: "搜索随笔",
+      searchMoments: "搜索片刻",
+      searchPlaceholder: "搜索公开内容",
+      searchResults: "结果：{count}",
+      searchNoResults: "没有匹配的内容。",
+      tableOfContents: "本文目录",
+      tableOfContentsSummary: "展开目录",
+      places: "去过的地方",
+      lived: "居住过",
+      visited: "到访过",
+      friends: "朋友们",
+      history: "网站沿革",
+      transcript: "阅读文字稿",
+      since: "始于 2026",
     },
   },
   fr: {
@@ -155,6 +209,24 @@ export const UI_TRANSLATIONS = {
       journal: "Aucun texte public pour le moment.",
       moments: "Aucun instant public pour le moment.",
       timeline: "Aucun contenu public pour le moment.",
+    },
+    discovery: {
+      topics: "Sujets",
+      topic: "Sujet",
+      searchJournal: "Rechercher dans le Journal",
+      searchMoments: "Rechercher dans les Instants",
+      searchPlaceholder: "Rechercher dans les contenus publics",
+      searchResults: "Résultats : {count}",
+      searchNoResults: "Aucun contenu correspondant.",
+      tableOfContents: "Sur cette page",
+      tableOfContentsSummary: "Afficher le sommaire",
+      places: "Lieux",
+      lived: "Habité",
+      visited: "Visité",
+      friends: "Amis",
+      history: "Histoire du site",
+      transcript: "Lire la transcription",
+      since: "Depuis 2026",
     },
   },
 } as const satisfies Record<Locale, UiTranslations>;

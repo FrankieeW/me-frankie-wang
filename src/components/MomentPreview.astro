@@ -27,16 +27,20 @@ const sizes =
 
 <article class:list={["moment-preview", `moment-preview--${variant}`]}>
   <a href={href} aria-label={entry.data.caption}>
-    <Image
-      src={image.src}
-      alt={image.alt}
-      widths={[320, 480, 640, 960]}
-      sizes={sizes}
-      loading={priority ? "eager" : "lazy"}
-      fetchpriority={priority ? "high" : undefined}
-      decoding="async"
-      format="avif"
-    />
+    {
+      image !== undefined && (
+        <Image
+          src={image.src}
+          alt={image.alt}
+          widths={[320, 480, 640, 960]}
+          sizes={sizes}
+          loading={priority ? "eager" : "lazy"}
+          fetchpriority={priority ? "high" : undefined}
+          decoding="async"
+          format="avif"
+        />
+      )
+    }
     <div class="moment-preview__overlay">
       <span>{copy.navigation.moments}</span>
       <time datetime={entry.data.takenAt.toISOString()}>

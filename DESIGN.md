@@ -430,6 +430,75 @@ may remain within its page; one used twice becomes a reusable primitive.
 - **Empty state:** absent Journal content removes the card; it is not replaced
   with a fake title or excerpt.
 
+### TopicLinks
+
+- **Structure:** a labelled inline list of ordinary underlined anchors. Each
+  link uses a finite localized topic label and points to the current locale's
+  generated topic index.
+- **Surface:** transparent, 12px metadata type, muted ink at rest, accessible
+  accent ink on hover/focus. Topic links are not filled chips or button-like
+  pills.
+- **Population:** render only configured topics, in author order, with no more
+  than three unique items. An empty topic list renders no wrapper.
+- **Accessibility:** links remain normal document navigation and use the global
+  focus outline. The list has a localized accessible label.
+
+### ContentSearch
+
+- **Structure:** localized programmatic label, native `input[type="search"]`,
+  polite live result count, and a textual no-results state. It appears between
+  the section heading and the existing preview collection.
+- **Threshold:** omit the complete component below ten public entries for the
+  current locale and section. At ten or more, all previews remain in the
+  initial HTML and JavaScript only toggles their `hidden` state.
+- **Surface:** white input, 1px strong line, 12px radius, body type, and a
+  minimum 44px control height. Focus uses the global outline; no filled search
+  button or remote-result panel is introduced.
+- **Recovery:** clearing restores every preview. Missing or failed JavaScript
+  leaves the complete unfiltered index visible and navigable.
+
+### TableOfContents
+
+- **Structure:** one ordered H2/H3 link sequence with H3 links visually
+  indented. It appears only at three or more eligible headings.
+- **Desktop:** above 820px, a narrow sticky rail sits outside the 680px reading
+  column and must not shrink that column.
+- **Tablet/mobile:** at 820px and below, the same links render in a native
+  `details` disclosure between entry metadata and prose. Its summary meets the
+  44px coarse-pointer target.
+- **Behavior:** every item is an ordinary hash link to Astro's generated
+  heading ID. There is no smooth scrolling, active-heading tracking, or
+  client-side scroll observer.
+
+### EntryMedia
+
+- **Structure:** semantic figure plus native video or audio controls and
+  localized supporting text. Video includes a processed local poster and a
+  same-origin captions track; audio includes a normal transcript link.
+- **Sizing:** media occupies the entry width with an explicit 16:9 aspect ratio
+  for video; audio remains within the 680px reading column. Native controls are
+  never visually replaced.
+- **Behavior:** `controls` and `preload="metadata"` are required; video also
+  uses `playsinline`. Autoplay, background playback, remote iframes, playlists,
+  and provider SDKs are prohibited.
+- **Failure:** missing source metadata, caption track, poster alternative, or
+  transcript fails authoring validation instead of rendering a placeholder.
+
+### PlaceIndex, FriendsList, and SiteHistory
+
+- **PlaceIndex:** an accessible localized city/country list is the semantic
+  source of truth. When every configured place has approximate 0–100 plotting
+  coordinates, an `aria-hidden` schematic plot may echo the list using existing
+  line and accent tokens; it makes no geographic-precision claim.
+- **FriendsList:** a small text-led list of consented same-tab HTTPS links with
+  `rel="friend"`; optional avatars are local Astro assets with localized alt.
+  It does not become a directory grid or primary navigation destination.
+- **SiteHistory:** a compact ordered year/description list within the Hello
+  reading width. It always renders the verified 2026 launch record.
+- **Empty states:** zero places or zero friends removes that complete section;
+  no teaser, disabled heading, map frame, avatar placeholder, or invented fact
+  remains.
+
 ### LivingScrapbook
 
 - **Structure:** the DOM order is lead Moment, latest Journal, square Moment,
@@ -461,7 +530,8 @@ may remain within its page; one used twice becomes a reusable primitive.
 - **SkipLink:** first focusable element; hidden at rest and visible on focus;
   targets the page's `main` landmark.
 - **Footer:** site name, localized Hello label, and compact locale summary. It
-  repeats no fake biography and contains only configured external links.
+  includes localized `Since 2026`, repeats no fake biography, and contains only
+  configured external links.
 
 ## 6. Motion & Interaction
 
@@ -547,6 +617,18 @@ space, 1px lines, and one hard offset layer; soft shadows are rare.
   content, affordances, or route access.
 - Plain copy is preferred over clever labels. Tooltips repeat accessible names
   and never contain essential information.
+- Search exposes a real label, live result count, textual no-results recovery,
+  and a 44px native control; filtering never becomes the only route to content.
+- Table-of-contents links follow source order and work without JavaScript. The
+  native disclosure remains keyboard and screen-reader operable.
+- Video captions, poster alternatives, audio transcripts, and native controls
+  are publication requirements. Media never autoplays.
+- Places are limited to stable IDs, lived/visited kind, localized city/country,
+  and optional approximate 0–100 plot positions. Precise coordinates,
+  addresses, dates, current-location state, and browser geolocation are not
+  representable.
+- Friend links require HTTPS and explicit confirmed consent. Remote avatars
+  and third-party profile embeds are prohibited.
 
 ### Accepted debt
 

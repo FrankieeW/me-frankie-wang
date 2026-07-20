@@ -1,3 +1,5 @@
+import type { TopicKey } from "../data/topics.ts";
+
 export const LOCALES = ["en", "zh", "fr"] as const;
 
 export type Locale = (typeof LOCALES)[number];
@@ -45,4 +47,8 @@ export function getEntryPath(
   translationKey: string,
 ): string {
   return `${getLocalizedPath(locale, route)}${translationKey}/`;
+}
+
+export function getTopicPath(locale: Locale, topic: TopicKey): string {
+  return `/${locale}/topics/${topic}/`;
 }
