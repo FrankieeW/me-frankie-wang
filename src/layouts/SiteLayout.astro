@@ -17,12 +17,13 @@ import "../styles/global.css";
 
 interface Props {
   readonly locale: Locale;
-  readonly route: LocalizedRoute;
+  readonly route?: LocalizedRoute;
   readonly title?: string;
   readonly description: string;
   readonly canonicalPath: string;
   readonly switchPaths: LocalePathMap;
   readonly alternatePaths: AlternatePathMap;
+  readonly robots?: "index, follow" | "noindex, follow";
 }
 
 const {
@@ -33,6 +34,7 @@ const {
   canonicalPath,
   switchPaths,
   alternatePaths,
+  robots = "index, follow",
 } = Astro.props;
 const pageTitle = title === undefined ? SITE.name : `${title} — ${SITE.name}`;
 const canonicalUrl = getCanonicalUrl(canonicalPath);
@@ -57,7 +59,7 @@ const openGraphLocales = {
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={robots} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{pageTitle}</title>
     <link rel="canonical" href={canonicalUrl} />
@@ -98,7 +100,7 @@ const openGraphLocales = {
       {UI_TRANSLATIONS[locale].accessibility.skipToContent}
     </a>
     <Header locale={locale} route={route} switchPaths={switchPaths} />
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
       <slot />
     </main>
     <Footer locale={locale} />

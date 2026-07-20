@@ -10,7 +10,7 @@ import LanguageSwitcher from "./LanguageSwitcher.astro";
 
 interface Props {
   readonly locale: Locale;
-  readonly route: LocalizedRoute;
+  readonly route: LocalizedRoute | undefined;
   readonly switchPaths: LocalePathMap;
 }
 

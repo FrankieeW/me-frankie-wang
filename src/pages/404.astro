@@ -1,0 +1,84 @@
+---
+import { getCoreLocalePaths } from "../lib/seo.ts";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const homePaths = getCoreLocalePaths("home");
+const noAlternatePaths = {
+  en: undefined,
+  zh: undefined,
+  fr: undefined,
+};
+---
+
+<SiteLayout
+  locale="en"
+  title="Page not found"
+  description="This address does not lead to a published page."
+  canonicalPath="/404/"
+  switchPaths={homePaths}
+  alternatePaths={noAlternatePaths}
+  robots="noindex, follow"
+>
+  <div class="page-shell not-found">
+    <header class="page-header">
+      <p class="not-found__code">ERROR / 404</p>
+      <h1>Page not found.</h1>
+      <p>This address does not lead to a published page.</p>
+      <a class="not-found__home" href="/en/">
+        Return home
+        <span aria-hidden="true">↗</span>
+      </a>
+    </header>
+  </div>
+</SiteLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    align-items: center;
+  }
+
+  .not-found__code {
+    margin: 0 0 var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-ink);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+  }
+
+  .not-found__code::before {
+    width: var(--space-7);
+    height: 2px;
+    flex: 0 0 auto;
+    background: var(--color-accent);
+    content: "";
+  }
+
+  .not-found__home {
+    min-height: var(--control-min-size);
+    margin-top: var(--space-8);
+    padding-inline: var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    border: 1px solid var(--color-ink);
+    background: var(--color-accent);
+    box-shadow: 3px 3px 0 var(--color-ink);
+    color: var(--color-paper);
+    font-size: 14px;
+    font-weight: 760;
+    text-decoration: none;
+    transition:
+      transform var(--motion-micro),
+      box-shadow var(--motion-micro);
+  }
+
+  .not-found__home:hover {
+    color: var(--color-paper);
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--color-ink);
+  }
+</style>
