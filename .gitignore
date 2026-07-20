@@ -4,6 +4,7 @@ dist/
 .vercel/
 .superpowers/
 .codegraph
+.worktrees/
 
 .env
 .env.*
